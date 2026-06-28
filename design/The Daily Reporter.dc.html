@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #f3efe7; font-family: 'Libre Franklin', system-ui, sans-serif; color: #16181d; -webkit-font-smoothing: antialiased; }
+  input, button, textarea { font-family: inherit; }
+  input::placeholder, textarea::placeholder { color: #9a968c; }
+  ::selection { background: #a8242f; color: #fff; }
+  @keyframes featPop { from { opacity: 0; transform: scale(.984); } to { opacity: 1; transform: scale(1); } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; background:#f3efe7;">
+
+  <!-- ============ GLOBAL HEADER ============ -->
+  <div style="background:#16181d; color:#cfcabd;">
+    <div style="max-width:1180px; margin:0 auto; padding:7px 22px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:12px; letter-spacing:.02em;">
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <span style="color:#fff; font-weight:600;">{{ todayLabel }}</span>
+        <span style="opacity:.45;">|</span>
+        <span>Outreach Ads · Digital PR · Editorial Placements</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:18px;">
+        <span style="cursor:pointer;" onClick="{{ goDash }}" style-hover="color:#fff; cursor:pointer;">My Campaigns</span>
+        <span style="opacity:.45;">|</span>
+        <span style="cursor:pointer;" style-hover="color:#fff; cursor:pointer;">Sign in</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#f6f1e8; border-bottom:1px solid #e2ddd2;">
+    <div style="max-width:1180px; margin:0 auto; padding:34px 48px 26px; text-align:center;">
+      <div style="height:1px; background:rgba(28,26,23,0.28); margin-bottom:20px;"></div>
+      <h1 onClick="{{ goHome }}" style="font-family:'Fraunces',Georgia,serif; font-weight:900; font-size:clamp(40px,6.4vw,84px); line-height:.95; letter-spacing:-.03em; color:#1c1a17; margin-bottom:14px; cursor:pointer;">The Daily <span style="color:#c43420;">Reporter</span></h1>
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8478; letter-spacing:.05em;"><span style="color:#c43420; font-weight:500;">{{ todayLabel }}</span> &nbsp;·&nbsp; Connecting California contractors to construction bidding leads</p>
+      <div style="height:1px; background:rgba(28,26,23,0.28); margin-top:20px;"></div>
+    </div>
+    <div style="border-top:1px solid #e2ddd2; border-bottom:2px solid #16181d;">
+      <div style="max-width:1180px; margin:0 auto; padding:0 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <nav style="display:flex; align-items:center; gap:2px; flex-wrap:wrap; font-family:'Zilla Slab',serif; font-weight:600; font-size:14.5px;">
+          <span onClick="{{ goHome }}" style="padding:13px 14px; cursor:pointer; color:#16181d;" style-hover="background:#f1ece2; cursor:pointer;">Home</span>
+          <span onClick="{{ goHome }}" style="padding:13px 14px; cursor:pointer; color:#16181d;" style-hover="background:#f1ece2; cursor:pointer;">Browse Outreach Ads</span>
+          <span style="padding:13px 14px; cursor:pointer; color:#16181d;" style-hover="background:#f1ece2; cursor:pointer;">Display Ads</span>
+          <span style="padding:13px 14px; cursor:pointer; color:#16181d;" style-hover="background:#f1ece2; cursor:pointer;">Services</span>
+        </nav>
+        <div onClick="{{ goPortal }}" style="display:flex; align-items:center; gap:8px; background:#a8242f; color:#fff; padding:9px 18px; margin:7px 0; cursor:pointer; font-family:'Zilla Slab',serif; font-weight:600; font-size:14px; border-radius:2px;" style-hover="background:#8c1d27; cursor:pointer;">
+          <span style="width:7px; height:7px; border-radius:50%; background:#fff; display:inline-block;"></span>
+          Run an ad
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1180px; margin:0 auto; padding:22px 22px 60px;">
+
+    <!-- leaderboard self-serve slot -->
+    <div onClick="{{ goPortal }}" style="margin-bottom:26px; border:1.5px dashed #c9b27e; background:repeating-linear-gradient(135deg,#faf6ec,#faf6ec 11px,#f5efe1 11px,#f5efe1 22px); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; cursor:pointer; flex-wrap:wrap;" style-hover="border-color:#a8242f; cursor:pointer;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="font-size:9.5px; letter-spacing:.18em; color:#a08a52; font-weight:700; writing-mode:vertical-rl; transform:rotate(180deg);">AD&nbsp;SPACE</div>
+        <div>
+          <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:19px; color:#16181d;">Your placement belongs here — 970 × 90 leaderboard</div>
+          <div style="font-size:13px; color:#6b6d75; margin-top:3px;">Reach 18,000 editors, founders &amp; decision-makers a day. Launch in minutes, no sales call.</div>
+        </div>
+      </div>
+      <div style="font-family:'Zilla Slab',serif; font-weight:600; font-size:14px; color:#a8242f; white-space:nowrap;">Start an ad →</div>
+    </div>
+
+    <!-- combined outreach placement box -->
+    <div style="border:2px solid #16181d; border-radius:3px; margin-bottom:30px; overflow:hidden;">
+      <div style="background:#16181d; color:#f6f1e8; padding:14px 20px; display:flex; align-items:center; gap:10px;">
+        <span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:clamp(15px,1.8vw,20px); letter-spacing:.02em; line-height:1.12;">Currently Running GFE Outreach Ads</span>
+        <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#5dd693; font-weight:600; white-space:nowrap;"><span style="width:7px; height:7px; border-radius:50%; background:#2f7d52; display:inline-block;"></span>Live</span>
+        <span style="flex:1; height:2px; background:#f6f1e8;"></span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:30px; align-items:start; padding:24px;">
+      <div style="grid-column:span 2; min-width:280px;">
+        <div key="{{ featured.heroKey }}" style="{{ featured.heroStyle }}">
+          <sc-if value="{{ featured.showCaption }}" hint-placeholder-val="{{ true }}">
+            <span style="font-family:ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.12em; color:#9a937f;">LEAD IMAGE — client editorial</span>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:18px; min-width:260px;">
+        <sc-for list="{{ secondary }}" as="item" hint-placeholder-count="3">
+          <div onClick="{{ item.onSelect }}" style="display:flex; gap:14px; padding-bottom:18px; border-bottom:1px solid #ece7dd; cursor:pointer;" style-hover="opacity:.74; cursor:pointer;">
+            <div style="flex:1;">
+              <div style="font-size:10px; letter-spacing:.16em; color:#a8242f; font-weight:700; margin-bottom:6px;">{{ item.kicker }}</div>
+              <h3 style="font-family:'Zilla Slab',serif; font-weight:600; font-size:18px; line-height:1.16; margin:0 0 6px;">{{ item.title }}</h3>
+              <div style="font-size:11.5px; color:#8a8c93;">{{ item.meta }}</div>
+            </div>
+            <div style="{{ item.boxStyle }}"></div>
+          </div>
+        </sc-for>
+      </div>
+      </div>
+    </div>
+
+    <!-- California Construction News header -->
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+      <span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:15px; letter-spacing:.02em;">California Construction News</span>
+      <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#2f7d52; font-weight:600;"><span style="width:7px; height:7px; border-radius:50%; background:#2f7d52; display:inline-block;"></span>Live</span>
+      <span style="flex:1; height:2px; background:#16181d;"></span>
+    </div>
+    <div style="font-size:12.5px; color:#6b6d75; margin-bottom:18px;">Sponsored editorial placements live across the network this week.</div>
+
+    <!-- featured editorial (under the box) -->
+    <div style="margin-bottom:30px; border-bottom:1px solid #e2ddd2; padding-bottom:30px;">
+      <div style="font-size:11px; letter-spacing:.18em; color:#a8242f; font-weight:700; margin-bottom:8px;">{{ featured.kicker }}</div>
+      <h1 style="font-family:'Zilla Slab',serif; font-weight:700; font-size:clamp(28px,3.6vw,40px); line-height:1.06; margin:0 0 12px; letter-spacing:-.01em;">{{ featured.title }}</h1>
+      <sc-if value="{{ featured.hasDek }}" hint-placeholder-val="{{ true }}">
+        <p style="font-size:16px; line-height:1.55; color:#3d3f47; margin:0 0 12px; max-width:70ch;">{{ featured.dek }}</p>
+      </sc-if>
+      <div style="font-size:12.5px; color:#6b6d75;">{{ featured.meta }}</div>
+    </div>
+
+    <!-- CURRENTLY RUNNING OUTREACH ADS + sidebar -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:38px; margin-top:32px; align-items:stretch;">
+      <!-- main col -->
+      <div style="grid-column:span 2; min-width:290px;">
+        <div style="display:flex; flex-direction:column; gap:0;">
+          <sc-for list="{{ latest }}" as="item" hint-placeholder-count="5">
+            <div style="display:flex; gap:18px; padding:18px 0; border-bottom:1px solid #ece7dd; cursor:pointer;" style-hover="opacity:.78; cursor:pointer;">
+              <div style="width:64px; height:64px; flex-shrink:0; background:#16181d; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Zilla Slab',serif; font-weight:700; font-size:26px;">{{ item.initial }}</div>
+              <div style="flex:1;">
+                <div style="display:flex; align-items:center; gap:9px; margin-bottom:6px; flex-wrap:wrap;">
+                  <span style="font-size:9.5px; letter-spacing:.14em; color:#a08a52; font-weight:700; border:1px solid #e0d3ad; background:#faf6ec; padding:2px 7px;">SPONSORED</span>
+                  <span style="font-size:10.5px; letter-spacing:.1em; color:#a8242f; font-weight:700;">{{ item.vertical }}</span>
+                </div>
+                <h3 style="font-family:'Zilla Slab',serif; font-weight:600; font-size:20px; line-height:1.14; margin:0 0 7px;">{{ item.title }}</h3>
+                <p style="font-size:13.5px; line-height:1.5; color:#5c5e66; margin:0 0 8px; font-style:italic;">“{{ item.quote }}”</p>
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:11.5px; color:#8a8c93;">
+                  <span style="font-weight:600; color:#16181d;">{{ item.brand }}</span>
+                  <span>{{ item.metric }}</span>
+                  <span style="display:inline-flex; align-items:center; gap:5px; color:#2f7d52; font-weight:600;"><span style="width:6px; height:6px; border-radius:50%; background:#2f7d52; display:inline-block;"></span>Running</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- in-feed billboard self-serve -->
+        <div onClick="{{ goPortal }}" style="margin-top:26px; border:1.5px dashed #c9b27e; background:repeating-linear-gradient(135deg,#faf6ec,#faf6ec 11px,#f5efe1 11px,#f5efe1 22px); padding:26px; text-align:center; cursor:pointer; border-radius:2px;" style-hover="border-color:#a8242f; cursor:pointer;">
+          <div style="font-size:9.5px; letter-spacing:.2em; color:#a08a52; font-weight:700; margin-bottom:9px;">IN-FEED BILLBOARD · 970 × 250</div>
+          <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:23px; margin-bottom:6px;">Get your brand in this feed</div>
+          <div style="font-size:13.5px; color:#6b6d75; margin-bottom:14px;">Self-serve placement, live in under five minutes.</div>
+          <span style="display:inline-block; background:#a8242f; color:#fff; padding:9px 20px; font-family:'Zilla Slab',serif; font-weight:600; font-size:13.5px; border-radius:2px;">Build your ad →</span>
+        </div>
+      </div>
+
+      <!-- sidebar -->
+      <div style="min-width:260px; display:flex; flex-direction:column; gap:26px;">
+        <!-- current issues -->
+        <div style="background:#16181d; color:#f3efe7; padding:20px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:3px;">
+            <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:16px;">Current Issues</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:#8a8c93;">VOL. XXXII</div>
+          </div>
+          <div style="font-size:11.5px; color:#9a968c; margin-bottom:16px;">This week's editions — tap to read</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <sc-for list="{{ editions }}" as="item" hint-placeholder-count="4">
+              <a href="{{ item.url }}" target="_blank" style="position:relative; display:block; aspect-ratio:3/4; border:1px solid rgba(255,255,255,0.12); border-radius:2px; overflow:hidden; background:#2c2e34; text-decoration:none;" style-hover="border-color:#d98a8f;">
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:10px; font-family:'Zilla Slab',serif; font-weight:700; font-size:12px; color:#6f7178; line-height:1.2;">{{ item.name }}</div>
+                <div style="{{ item.coverStyle }}"></div>
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 42%, rgba(15,24,40,0.92) 100%);"></div>
+                <div style="position:absolute; bottom:0; left:0; right:0; padding:9px 9px 8px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:.1em; color:#f0a84a; text-transform:uppercase; display:block; margin-bottom:2px;">{{ item.date }}</span>
+                  <span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:12.5px; color:#f6f1e8; line-height:1.15; display:block;">{{ item.name }}</span>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+          <div style="margin-top:15px; font-size:12px; color:#d98a8f; font-weight:600; cursor:pointer;">Browse all editions →</div>
+        </div>
+
+        <!-- skyscraper self-serve #1 -->
+        <div onClick="{{ goPortal }}" style="flex:1 1 0; border:1.5px dashed #c9b27e; background:repeating-linear-gradient(135deg,#faf6ec,#faf6ec 11px,#f5efe1 11px,#f5efe1 22px); padding:22px 18px; text-align:center; cursor:pointer; min-height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;" style-hover="border-color:#a8242f; cursor:pointer;">
+          <div style="font-size:9.5px; letter-spacing:.18em; color:#a08a52; font-weight:700;">SPONSOR SLOT · 300 × 600</div>
+          <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:20px; line-height:1.15;">Sponsor a vertical</div>
+          <div style="font-size:12.5px; color:#6b6d75;">Own the top of the feed editors open first.</div>
+          <span style="margin-top:6px; display:inline-block; color:#a8242f; font-family:'Zilla Slab',serif; font-weight:600; font-size:13.5px;">Reserve this slot →</span>
+        </div>
+
+        <!-- skyscraper self-serve #2 -->
+        <div onClick="{{ goPortal }}" style="flex:1 1 0; border:1.5px dashed #c9b27e; background:repeating-linear-gradient(135deg,#faf6ec,#faf6ec 11px,#f5efe1 11px,#f5efe1 22px); padding:22px 18px; text-align:center; cursor:pointer; min-height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;" style-hover="border-color:#a8242f; cursor:pointer;">
+          <div style="font-size:9.5px; letter-spacing:.18em; color:#a08a52; font-weight:700;">SPONSOR SLOT · 300 × 600</div>
+          <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:20px; line-height:1.15;">Sponsor a county</div>
+          <div style="font-size:12.5px; color:#6b6d75;">Reach every contractor bidding in your region.</div>
+          <span style="margin-top:6px; display:inline-block; color:#a8242f; font-family:'Zilla Slab',serif; font-weight:600; font-size:13.5px;">Reserve this slot →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ PORTAL WIZARD ============ -->
+  <sc-if value="{{ isPortal }}" hint-placeholder-val="{{ false }}">
+  <div style="background:#16181d;">
+    <div style="max-width:1180px; margin:0 auto; padding:20px 22px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:22px; color:#fff;">Run an ad — self-serve</div>
+        <div style="font-size:12.5px; color:#9a968c; margin-top:2px;">Build, schedule and launch a placement in four steps.</div>
+      </div>
+      <div onClick="{{ goHome }}" style="font-size:13px; color:#cfcabd; cursor:pointer; font-weight:500;" style-hover="color:#fff; cursor:pointer;">← Back to The Daily Reporter</div>
+    </div>
+    <!-- stepper -->
+    <div style="border-top:1px solid #2c2e34;">
+      <div style="max-width:1180px; margin:0 auto; padding:0 22px; display:flex; gap:0; flex-wrap:wrap;">
+        <sc-for list="{{ stepper }}" as="item" hint-placeholder-count="4">
+          <div onClick="{{ item.onClick }}" style="{{ item.tabStyle }}">
+            <span style="{{ item.numStyle }}">{{ item.num }}</span>
+            <span style="font-family:'Zilla Slab',serif; font-weight:600; font-size:14px;">{{ item.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1180px; margin:0 auto; padding:34px 22px 70px; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:34px; align-items:start;">
+    <!-- LEFT: step body -->
+    <div style="grid-column:span 2; min-width:300px;">
+
+      <!-- STEP 1 PLACEMENT -->
+      <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+        <h2 style="font-family:'Zilla Slab',serif; font-weight:700; font-size:25px; margin:0 0 6px;">Choose where your ad runs</h2>
+        <p style="font-size:14px; color:#5c5e66; margin:0 0 22px;">Every placement is sold by impression. Pick the inventory that fits your goal.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px;">
+          <sc-for list="{{ placements }}" as="item" hint-placeholder-count="5">
+            <div onClick="{{ item.onSelect }}" style="{{ item.cardStyle }}">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px;">
+                <div style="{{ item.miniStyle }}"></div>
+                <span style="{{ item.checkStyle }}">{{ item.check }}</span>
+              </div>
+              <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:17px; margin-bottom:3px;">{{ item.name }}</div>
+              <div style="font-size:12.5px; color:#6b6d75; line-height:1.4; margin-bottom:12px; min-height:34px;">{{ item.desc }}</div>
+              <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid #ece7dd; padding-top:10px;">
+                <span style="font-size:12px; color:#8a8c93;">{{ item.dims }}</span>
+                <span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:14px; color:#a8242f;">{{ item.priceLabel }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- STEP 2 CREATIVE -->
+      <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <h2 style="font-family:'Zilla Slab',serif; font-weight:700; font-size:25px; margin:0 0 6px;">Build your creative</h2>
+        <p style="font-size:14px; color:#5c5e66; margin:0 0 22px;">Upload a finished banner, or build one from text — it previews live on the right.</p>
+        <div style="display:inline-flex; border:1px solid #d8d2c5; border-radius:3px; overflow:hidden; margin-bottom:22px;">
+          <div onClick="{{ setBuild }}" style="{{ buildTabStyle }}">Build with text</div>
+          <div onClick="{{ setUpload }}" style="{{ uploadTabStyle }}">Upload image</div>
+        </div>
+
+        <sc-if value="{{ isBuild }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:18px; max-width:520px;">
+            <label style="display:block;">
+              <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:6px;">Headline</span>
+              <input value="{{ headline }}" onInput="{{ onHeadline }}" maxlength="48" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+            </label>
+            <label style="display:block;">
+              <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:6px;">Body copy</span>
+              <textarea onInput="{{ onBody }}" rows="2" maxlength="110" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:14px; background:#fff; resize:vertical;">{{ bodyText }}</textarea>
+            </label>
+            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+              <label style="flex:1; min-width:160px;">
+                <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:6px;">Button label</span>
+                <input value="{{ cta }}" onInput="{{ onCta }}" maxlength="22" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+              </label>
+              <label style="flex:1; min-width:160px;">
+                <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:6px;">Landing URL</span>
+                <input value="{{ url }}" onInput="{{ onUrl }}" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+              </label>
+            </div>
+            <div>
+              <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:8px;">Accent color</span>
+              <div style="display:flex; gap:9px;">
+                <sc-for list="{{ swatches }}" as="item" hint-placeholder-count="4">
+                  <span onClick="{{ item.onPick }}" style="{{ item.style }}"></span>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isUpload }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ doUpload }}" style="max-width:520px; border:1.5px dashed #c9b27e; background:repeating-linear-gradient(135deg,#faf6ec,#faf6ec 11px,#f5efe1 11px,#f5efe1 22px); border-radius:4px; padding:46px 24px; text-align:center; cursor:pointer;" style-hover="border-color:#a8242f; cursor:pointer;">
+            <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:18px; margin-bottom:6px;">{{ uploadHeadline }}</div>
+            <div style="font-size:13px; color:#6b6d75;">{{ uploadSub }}</div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <!-- STEP 3 SCHEDULE -->
+      <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+        <h2 style="font-family:'Zilla Slab',serif; font-weight:700; font-size:25px; margin:0 0 6px;">Schedule your run</h2>
+        <p style="font-size:14px; color:#5c5e66; margin:0 0 22px;">Set the window your campaign is live. Pacing spreads delivery evenly across these dates.</p>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; max-width:520px;">
+          <label style="flex:1; min-width:170px;">
+            <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:6px;">Start date</span>
+            <input type="date" value="{{ startDate }}" onChange="{{ onStart }}" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+          </label>
+          <label style="flex:1; min-width:170px;">
+            <span style="font-size:12.5px; font-weight:600; color:#3d3f47; display:block; margin-bottom:6px;">End date</span>
+            <input type="date" value="{{ endDate }}" onChange="{{ onEnd }}" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+          </label>
+        </div>
+        <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+          <sc-for list="{{ presets }}" as="item" hint-placeholder-count="3">
+            <span onClick="{{ item.onPick }}" style="border:1px solid #d8d2c5; background:#fff; padding:8px 15px; border-radius:30px; font-size:13px; font-weight:500; cursor:pointer; color:#3d3f47;" style-hover="border-color:#a8242f; color:#a8242f; cursor:pointer;">{{ item.label }}</span>
+          </sc-for>
+        </div>
+        <div style="margin-top:24px; display:inline-flex; align-items:center; gap:14px; background:#fbf6ec; border:1px solid #ecdfc4; border-radius:4px; padding:14px 20px;">
+          <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:30px; color:#16181d;">{{ days }}</div>
+          <div style="font-size:13px; color:#5c5e66; line-height:1.35;">days live<br><span style="color:#8a8c93;">{{ dateRangeLabel }}</span></div>
+        </div>
+      </sc-if>
+
+      <!-- STEP 4 BUDGET + CHECKOUT -->
+      <sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+        <h2 style="font-family:'Zilla Slab',serif; font-weight:700; font-size:25px; margin:0 0 6px;">Set budget &amp; check out</h2>
+        <p style="font-size:14px; color:#5c5e66; margin:0 0 24px;">Your budget caps total spend. We pace delivery to the best impressions available.</p>
+
+        <div style="max-width:560px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-size:12.5px; font-weight:600; color:#3d3f47;">Total budget</span>
+            <span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:28px;">{{ budgetLabel }}</span>
+          </div>
+          <input type="range" min="100" max="5000" step="50" value="{{ budget }}" onInput="{{ onBudget }}" style="width:100%; accent-color:#a8242f; height:6px;" />
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#9a968c; margin-top:4px;">
+            <span>$100</span><span>$5,000</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-top:24px;">
+            <div style="border:1px solid #e2ddd2; background:#fff; border-radius:4px; padding:15px;">
+              <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:24px; color:#a8242f;">{{ estImpr }}</div>
+              <div style="font-size:11.5px; color:#6b6d75; margin-top:2px;">est. impressions</div>
+            </div>
+            <div style="border:1px solid #e2ddd2; background:#fff; border-radius:4px; padding:15px;">
+              <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:24px; color:#16181d;">{{ estClicks }}</div>
+              <div style="font-size:11.5px; color:#6b6d75; margin-top:2px;">est. clicks</div>
+            </div>
+            <div style="border:1px solid #e2ddd2; background:#fff; border-radius:4px; padding:15px;">
+              <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:24px; color:#16181d;">{{ cpmLabel }}</div>
+              <div style="font-size:11.5px; color:#6b6d75; margin-top:2px;">effective CPM</div>
+            </div>
+          </div>
+
+          <div style="margin-top:30px; border-top:1px solid #e2ddd2; padding-top:22px;">
+            <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:16px; margin-bottom:14px;">Payment</div>
+            <div style="display:flex; flex-direction:column; gap:13px;">
+              <input placeholder="Card number" style="width:100%; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+              <div style="display:flex; gap:13px;">
+                <input placeholder="MM / YY" style="flex:1; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+                <input placeholder="CVC" style="flex:1; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+                <input placeholder="ZIP" style="flex:1; padding:11px 13px; border:1px solid #d8d2c5; border-radius:3px; font-size:15px; background:#fff;" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- nav buttons -->
+      <div style="display:flex; align-items:center; gap:14px; margin-top:34px;">
+        <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+          <span onClick="{{ back }}" style="padding:12px 22px; border:1px solid #d8d2c5; background:#fff; border-radius:3px; font-family:'Zilla Slab',serif; font-weight:600; font-size:14.5px; cursor:pointer; color:#3d3f47;" style-hover="border-color:#16181d; cursor:pointer;">Back</span>
+        </sc-if>
+        <span onClick="{{ next }}" style="padding:12px 26px; background:#a8242f; color:#fff; border-radius:3px; font-family:'Zilla Slab',serif; font-weight:600; font-size:14.5px; cursor:pointer;" style-hover="background:#8c1d27; cursor:pointer;">{{ nextLabel }}</span>
+        <span style="font-size:12.5px; color:#9a968c;">{{ stepHint }}</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: summary + live preview -->
+    <div style="min-width:280px; position:sticky; top:16px;">
+      <div style="border:1px solid #e2ddd2; background:#fff; border-radius:5px; overflow:hidden;">
+        <div style="background:#16181d; color:#fff; padding:13px 18px; font-family:'Zilla Slab',serif; font-weight:600; font-size:14.5px;">Live preview</div>
+        <div style="padding:20px; background:#f7f4ee; display:flex; align-items:center; justify-content:center; min-height:150px;">
+          <div style="{{ adShellStyle }}">
+            <sc-if value="{{ previewBuild }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ adAccentStyle }}"></div>
+              <div style="padding:14px 16px;">
+                <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:17px; line-height:1.1; color:#16181d; margin-bottom:5px;">{{ headline }}</div>
+                <div style="font-size:12px; color:#5c5e66; line-height:1.4; margin-bottom:11px;">{{ bodyText }}</div>
+                <span style="{{ adBtnStyle }}">{{ cta }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ previewUpload }}" hint-placeholder-val="{{ false }}">
+              <div style="background:repeating-linear-gradient(135deg,#e7e1d4,#e7e1d4 9px,#ded7c7 9px,#ded7c7 18px); width:100%; height:100%; min-height:120px; display:flex; align-items:center; justify-content:center;">
+                <span style="font-family:ui-monospace,monospace; font-size:10px; color:#9a937f; letter-spacing:.1em;">YOUR UPLOADED BANNER</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="padding:6px 18px 4px; text-align:center; font-size:9px; letter-spacing:.14em; color:#a8a394;">{{ sel.dims }} · {{ sel.name }}</div>
+
+        <div style="padding:16px 18px 20px; border-top:1px solid #ece7dd;">
+          <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:14px; margin-bottom:12px;">Order summary</div>
+          <div style="display:flex; flex-direction:column; gap:9px; font-size:13px;">
+            <div style="display:flex; justify-content:space-between;"><span style="color:#6b6d75;">Placement</span><span style="font-weight:600; text-align:right;">{{ sel.name }}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:#6b6d75;">Flight</span><span style="font-weight:600; text-align:right;">{{ days }} days</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:#6b6d75;">Est. impressions</span><span style="font-weight:600;">{{ estImpr }}</span></div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid #ece7dd; padding-top:11px; margin-top:3px;"><span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:15px;">Total</span><span style="font-family:'Zilla Slab',serif; font-weight:700; font-size:18px; color:#a8242f;">{{ budgetLabel }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ DASHBOARD ============ -->
+  <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1180px; margin:0 auto; padding:34px 22px 70px;">
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:26px;">
+      <div>
+        <h2 style="font-family:'Zilla Slab',serif; font-weight:700; font-size:28px; margin:0;">Campaign Manager</h2>
+        <p style="font-size:13.5px; color:#5c5e66; margin:4px 0 0;">Your live and past placements on The Daily Reporter.</p>
+      </div>
+      <span onClick="{{ newCampaign }}" style="padding:11px 22px; background:#a8242f; color:#fff; border-radius:3px; font-family:'Zilla Slab',serif; font-weight:600; font-size:14px; cursor:pointer;" style-hover="background:#8c1d27; cursor:pointer;">+ New campaign</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:16px; margin-bottom:30px;">
+      <div style="border:1px solid #e2ddd2; background:#fff; border-radius:5px; padding:18px;">
+        <div style="font-size:12px; color:#6b6d75; margin-bottom:6px;">Active campaigns</div>
+        <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:32px;">{{ statActive }}</div>
+      </div>
+      <div style="border:1px solid #e2ddd2; background:#fff; border-radius:5px; padding:18px;">
+        <div style="font-size:12px; color:#6b6d75; margin-bottom:6px;">Impressions delivered</div>
+        <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:32px;">{{ statImpr }}</div>
+      </div>
+      <div style="border:1px solid #e2ddd2; background:#fff; border-radius:5px; padding:18px;">
+        <div style="font-size:12px; color:#6b6d75; margin-bottom:6px;">Total spend</div>
+        <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:32px;">{{ statSpend }}</div>
+      </div>
+      <div style="border:1px solid #e2ddd2; background:#fff; border-radius:5px; padding:18px;">
+        <div style="font-size:12px; color:#6b6d75; margin-bottom:6px;">Avg. CTR</div>
+        <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:32px;">0.41%</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid #e2ddd2; background:#fff; border-radius:5px; overflow:hidden;">
+      <div style="display:flex; padding:13px 20px; background:#faf7f1; border-bottom:1px solid #e2ddd2; font-size:11px; letter-spacing:.08em; color:#8a8c93; font-weight:700; text-transform:uppercase;">
+        <div style="flex:2.4; min-width:160px;">Campaign</div>
+        <div style="flex:1.4;">Delivery</div>
+        <div style="flex:1; text-align:right;">Spend</div>
+        <div style="flex:1; text-align:right;">Status</div>
+      </div>
+      <sc-for list="{{ campaigns }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid #f0ebe1; gap:10px; flex-wrap:wrap;">
+          <div style="flex:2.4; min-width:160px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="{{ item.newBadgeStyle }}">{{ item.newBadge }}</span>
+              <span style="font-family:'Zilla Slab',serif; font-weight:600; font-size:15.5px;">{{ item.name }}</span>
+            </div>
+            <div style="font-size:11.5px; color:#8a8c93; margin-top:3px;">{{ item.placement }} · {{ item.range }}</div>
+          </div>
+          <div style="flex:1.4; min-width:130px;">
+            <div style="height:7px; background:#ece7dd; border-radius:4px; overflow:hidden; margin-bottom:5px;">
+              <div style="{{ item.barStyle }}"></div>
+            </div>
+            <div style="font-size:11.5px; color:#6b6d75;">{{ item.imprLabel }} / {{ item.goalLabel }}</div>
+          </div>
+          <div style="flex:1; text-align:right; min-width:80px;">
+            <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:15px;">{{ item.spendLabel }}</div>
+            <div style="font-size:11px; color:#8a8c93;">of {{ item.budgetLabel }}</div>
+          </div>
+          <div style="flex:1; text-align:right; min-width:80px;">
+            <span style="{{ item.statusStyle }}">{{ item.status }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ FOOTER ============ -->
+  <div style="background:#16181d; color:#9a968c; margin-top:0;">
+    <div style="max-width:1180px; margin:0 auto; padding:34px 22px; display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+      <div style="max-width:300px;">
+        <div style="font-family:'Zilla Slab',serif; font-weight:700; font-size:20px; color:#fff; margin-bottom:8px;">The Daily Reporter</div>
+        <div style="font-size:12.5px; line-height:1.5;">Sponsored editorial placements and outreach ads that earn brands authority in search and AI.</div>
+      </div>
+      <div style="display:flex; gap:48px; flex-wrap:wrap; font-size:13px;">
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <span style="color:#fff; font-weight:600; font-family:'Zilla Slab',serif;">Browse</span>
+          <span onClick="{{ goHome }}" style="cursor:pointer;" style-hover="color:#fff; cursor:pointer;">Outreach Ads</span>
+          <span>Display Ads</span><span>Verticals</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <span style="color:#fff; font-weight:600; font-family:'Zilla Slab',serif;">Advertise</span>
+          <span onClick="{{ goPortal }}" style="cursor:pointer;" style-hover="color:#fff; cursor:pointer;">Run an ad</span>
+          <span onClick="{{ goDash }}" style="cursor:pointer;" style-hover="color:#fff; cursor:pointer;">Campaign manager</span>
+          <span>Media kit</span>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #2c2e34;">
+      <div style="max-width:1180px; margin:0 auto; padding:14px 22px; font-size:11.5px; color:#6b6d75;">© 2026 The Daily Reporter · Prototype</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    view: 'home',
+    featured: null,
+    featSeq: 0,
+    step: 1,
+    placementId: 'billboard',
+    creativeMode: 'build',
+    uploaded: false,
+    headline: 'Built to last. Bid with confidence.',
+    bodyText: "Wisconsin's trusted ready-mix & precast since 1974.",
+    cta: 'Request a quote',
+    url: 'meridianconcrete.com',
+    accent: '#a8242f',
+    startDate: '2026-07-06',
+    endDate: '2026-07-19',
+    budget: 750,
+    campaigns: [
+      { id:'c1', name:'Q3 brand awareness', placement:'Homepage Billboard', status:'Live', spend:540, budget:900, impressions:142300, goal:180000, range:'Jun 12 – Jul 10', isNew:false },
+      { id:'c2', name:'Bids column sponsorship', placement:'Sidebar Sponsor', status:'Live', spend:310, budget:600, impressions:38900, goal:62000, range:'Jun 20 – Jul 20', isNew:false },
+      { id:'c3', name:'Spring recruiting drive', placement:'Newsletter Banner', status:'Ended', spend:480, budget:480, impressions:96000, goal:96000, range:'May 1 – May 31', isNew:false }
+    ]
+  };
+
+  DEFAULT_FEATURED = {
+    kicker:'SPONSORED · HEALTHCARE',
+    title:"Adult women aren't developing ADHD late — they've been masking it for decades",
+    dek:"A 73% increase in women over 35 seeking evaluation this year points to a long-overdue correction, says Anchor Mental Health's chief clinical officer — and the data is reshaping how clinicians screen.",
+    meta:'Placed for Anchor Mental Health · Live · 14 syndications'
+  };
+
+  SECONDARY = [
+    { kicker:'STEVE P. RADOS, INC.', title:'Western Trunk Line Project – Phase 1', meta:'Bid date: June 30, 2026 at 2:00 PM', logo:'assets/stevebanner2.gif' },
+    { kicker:'CRATUS, INC.', title:'8-Inch Ductile Iron Water Main Replacement, Sewer Replacement, and Paving Renovation on', meta:'Bid Date: July 2, 2026 at 12:00 AM', logo:'assets/cratus-logo.png' },
+    { kicker:'SULLY-MILLER CONTRACTING COMPANY', title:'San Pedro Waterfront – Harbor Boulevard Roadway and 22nd Street Parking Lot Improvements', meta:'Bid date: July 8, 2026 at 2:45 PM', logo:'assets/sully-miller-logo.png' }
+  ];
+
+  LATEST = [
+    { initial:'A', brand:'Anchor Mental Health', vertical:'HEALTHCARE', title:"Adult women aren't developing ADHD late — they've been masking it for decades", quote:"A 73% jump in women over 35 seeking evaluation isn't an epidemic — it's a correction.", metric:'Placed via Qwoted · DR 81' },
+    { initial:'N', brand:'Northwind Analytics', vertical:'B2B SAAS', title:'The hidden cost of dashboard sprawl on mid-market finance teams', quote:'Teams now juggle nine reporting tools on average — and fully trust none of them.', metric:'Editorial feature · DR 76' },
+    { initial:'C', brand:'Cedar & Sage Home', vertical:'ECOMMERCE', title:'What 12,000 orders taught us about packaging that survives shipping', quote:"Recyclable isn't the bar anymore — buyers want zero-waste that still protects the product.", metric:'Product story · DR 72' },
+    { initial:'B', brand:'Beacon Credit Union', vertical:'FINANCIAL SERVICES', title:'How first-time buyers are actually closing deals at 6% mortgage rates', quote:"Rate buy-downs and assumable loans are quietly back — most buyers just don't ask.", metric:'Expert byline · DR 84' },
+    { initial:'S', brand:'Sentinel Edge', vertical:'CYBERSECURITY', title:'The invoice-spoofing tactic now targeting construction procurement teams', quote:'Attackers study your bid calendar — the fake change-order lands the week a contract closes.', metric:'Bylined op-ed · DR 79' }
+  ];
+
+  VERTICALS = [
+    { name:'Healthcare', count:34, dr:'DR 80+' },
+    { name:'B2B SaaS', count:28, dr:'DR 74+' },
+    { name:'Financial Services', count:21, dr:'DR 82+' },
+    { name:'eCommerce', count:19, dr:'DR 70+' },
+    { name:'Cybersecurity', count:12, dr:'DR 78+' }
+  ];
+
+  PLACEMENTS = [
+    { id:'leaderboard', name:'Homepage Leaderboard', desc:'Top of the homepage, above the lead story. Maximum reach.', dims:'970 × 90', cpm:12, maxDaily:18000, w:970, h:90 },
+    { id:'billboard', name:'Homepage Billboard', desc:'Large in-feed unit between top stories. High engagement.', dims:'970 × 250', cpm:18, maxDaily:14000, w:970, h:250 },
+    { id:'rectangle', name:'Sidebar Rectangle', desc:'Sits beside every article in the right rail.', dims:'300 × 250', cpm:9, maxDaily:9500, w:300, h:250 },
+    { id:'sponsor', name:'Vertical Sponsor', desc:'Own the top of a vertical editors open first.', dims:'300 × 600', cpm:14, maxDaily:6200, w:300, h:600 },
+    { id:'newsletter', name:'Newsletter Banner', desc:'Top banner in the 11,000-subscriber daily digest.', dims:'600 × 120', cpm:22, maxDaily:11000, w:600, h:120 }
+  ];
+
+  EDITIONS = [
+    { name:"Builder's Blueprint", date:'March 31', url:'https://www.flipsnack.com/66F8CBDD75E/builder-sblueprint-march-31-2026', img:'https://thedailyreporter.net/tmp/Builder%E2%80%99sBlueprint-march-31-2026-1.jpg' },
+    { name:'Southern CA Edition', date:'April 1', url:'https://www.flipsnack.com/66F8CBDD75E/reporter-april-1-2026-south', img:'https://thedailyreporter.net/tmp/reporter-April%201-2026-south-1.jpg' },
+    { name:'Northern CA Edition', date:'April 2', url:'https://www.flipsnack.com/66F8CBDD75E/reporter-april-2-2026-north', img:'https://thedailyreporter.net/tmp/Reporter-April%202-2026-north-1.jpg' },
+    { name:'CA State Water Edition', date:'March 27', url:'https://www.flipsnack.com/66F8CBDD75E/reporter-march-27-2026-water', img:'https://thedailyreporter.net/tmp/Reporter-March-27-2026-Water-1.jpg' }
+  ];
+
+  SWATCHES = ['#a8242f', '#16181d', '#1f5f8b', '#2f7d52'];
+  STEPS = [ {n:1,label:'Placement'}, {n:2,label:'Creative'}, {n:3,label:'Schedule'}, {n:4,label:'Budget & checkout'} ];
+
+  fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  money(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+  compact(n) {
+    if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace('.0','') + 'K';
+    return '' + Math.round(n);
+  }
+  parseDate(s) { return new Date(s + 'T00:00:00'); }
+  dayCount() {
+    const a = this.parseDate(this.state.startDate), b = this.parseDate(this.state.endDate);
+    const d = Math.round((b - a) / 86400000) + 1;
+    return Math.max(1, isNaN(d) ? 1 : d);
+  }
+  rangeLabel() {
+    const o = { month:'short', day:'numeric' };
+    return this.parseDate(this.state.startDate).toLocaleDateString('en-US', o) + ' – ' + this.parseDate(this.state.endDate).toLocaleDateString('en-US', o);
+  }
+
+  setPreset(n) {
+    const start = this.parseDate(this.state.startDate);
+    const end = new Date(start.getTime() + (n - 1) * 86400000);
+    this.setState({ endDate: end.toISOString().slice(0, 10) });
+  }
+
+  next() {
+    if (this.state.step < 4) { this.setState({ step: this.state.step + 1 }); window.scrollTo(0,0); }
+    else this.launch();
+  }
+  back() { if (this.state.step > 1) this.setState({ step: this.state.step - 1 }); }
+
+  launch() {
+    const sel = this.PLACEMENTS.find(p => p.id === this.state.placementId);
+    const days = this.dayCount();
+    const dailyImpr = Math.min(sel.maxDaily, ((this.state.budget / days) / sel.cpm) * 1000);
+    const total = Math.round(dailyImpr * days);
+    const today = this.parseDate('2026-06-27');
+    const live = this.parseDate(this.state.startDate) <= today;
+    const c = {
+      id: 'c' + Date.now(),
+      name: this.state.headline || 'New campaign',
+      placement: sel.name,
+      status: live ? 'Live' : 'Scheduled',
+      spend: live ? Math.round(this.state.budget * 0.04) : 0,
+      budget: this.state.budget,
+      impressions: live ? Math.round(total * 0.03) : 0,
+      goal: total,
+      range: this.rangeLabel(),
+      isNew: true
+    };
+    this.setState({ campaigns: [c, ...this.state.campaigns.map(x => ({...x, isNew:false}))], view: 'dashboard', step: 1 });
+    window.scrollTo(0, 0);
+  }
+
+  buildFeatured() {
+    const s = this.state;
+    const heroBase = 'width:100%; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; margin-bottom:16px; position:relative; animation:featPop .45s ease;';
+    if (!s.featured) {
+      const f = this.DEFAULT_FEATURED;
+      return {
+        heroKey: 'hero-' + s.featSeq, badge: 'FEATURED PLACEMENT',
+        heroStyle: heroBase + ' background:repeating-linear-gradient(135deg,#e7e1d4,#e7e1d4 12px,#ded7c7 12px,#ded7c7 24px);',
+        showCaption: true, kicker: f.kicker, title: f.title,
+        hasDek: true, dek: f.dek, meta: f.meta
+      };
+    }
+    const f = s.featured;
+    const bg = f.logo
+      ? ' background:#fff url(' + f.logo + ') center/contain no-repeat; padding:26px; border:1px solid #ece7dd;'
+      : ' background:repeating-linear-gradient(135deg,#e7e1d4,#e7e1d4 12px,#ded7c7 12px,#ded7c7 24px);';
+    return {
+      heroKey: 'hero-' + s.featSeq, badge: 'FEATURED PLACEMENT',
+      heroStyle: heroBase + bg,
+      showCaption: false, kicker: 'SPONSORED · ' + f.kicker, title: f.title,
+      hasDek: false, dek: '', meta: 'Outreach Ad · ' + f.meta
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const sel = this.PLACEMENTS.find(p => p.id === s.placementId) || this.PLACEMENTS[0];
+    const days = this.dayCount();
+    const dailyImpr = Math.min(sel.maxDaily, ((s.budget / days) / sel.cpm) * 1000);
+    const totalImpr = Math.round(dailyImpr * days);
+    const clicks = Math.round(totalImpr * 0.004);
+    const effCpm = totalImpr > 0 ? (s.budget / totalImpr) * 1000 : 0;
+
+    const placements = this.PLACEMENTS.map(p => {
+      const seld = p.id === s.placementId;
+      const mx = Math.max(p.w, p.h), mw = 50 * (p.w / mx), mh = 50 * (p.h / mx);
+      return {
+        ...p,
+        priceLabel: '$' + p.cpm + ' CPM',
+        onSelect: () => this.setState({ placementId: p.id }),
+        cardStyle: 'border:1.5px solid ' + (seld ? '#a8242f' : '#e2ddd2') + '; background:#fff; border-radius:5px; padding:16px; cursor:pointer; box-shadow:' + (seld ? '0 0 0 3px rgba(168,36,47,.12)' : 'none') + ';',
+        miniStyle: 'width:' + mw + 'px; height:' + mh + 'px; background:' + (seld ? '#a8242f' : '#cfc7b6') + '; border-radius:2px;',
+        check: seld ? '✓' : '',
+        checkStyle: 'width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; background:' + (seld ? '#a8242f' : 'transparent') + '; border:' + (seld ? 'none' : '1.5px solid #d8d2c5') + ';'
+      };
+    });
+
+    const swatches = this.SWATCHES.map(c => ({
+      onPick: () => this.setState({ accent: c }),
+      style: 'width:28px; height:28px; border-radius:50%; cursor:pointer; background:' + c + '; box-shadow:' + (s.accent === c ? '0 0 0 2px #fff, 0 0 0 4px ' + c : 'inset 0 0 0 1px rgba(0,0,0,.15)') + ';'
+    }));
+
+    const presets = [ {label:'1 week',d:7}, {label:'2 weeks',d:14}, {label:'30 days',d:30} ].map(p => ({
+      label: p.label, onPick: () => this.setPreset(p.d)
+    }));
+
+    const stepper = this.STEPS.map(st => {
+      const active = s.step === st.n, done = s.step > st.n;
+      return {
+        num: done ? '✓' : st.n, label: st.label,
+        onClick: () => { if (st.n < s.step) this.setState({ step: st.n }); },
+        tabStyle: 'display:flex; align-items:center; gap:9px; padding:14px 18px; cursor:pointer; color:' + (active ? '#fff' : '#9a968c') + '; border-bottom:3px solid ' + (active ? '#a8242f' : 'transparent') + ';',
+        numStyle: 'width:23px; height:23px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:' + (active ? '#a8242f' : (done ? '#2f7d52' : '#2c2e34')) + '; color:#fff;'
+      };
+    });
+
+    const campaigns = s.campaigns.map(c => {
+      const pct = Math.min(100, Math.round((c.impressions / c.goal) * 100)) || 0;
+      const liveStat = c.status === 'Live';
+      const stColors = c.status === 'Live' ? ['#e7f3ec','#2f7d52'] : (c.status === 'Scheduled' ? ['#fbf2e3','#a8742a'] : ['#efece5','#8a8c93']);
+      return {
+        ...c,
+        barStyle: 'width:' + pct + '%; height:100%; background:' + (liveStat ? '#2f7d52' : (c.status === 'Scheduled' ? '#cdb079' : '#b7b1a4')) + ';',
+        imprLabel: this.compact(c.impressions), goalLabel: this.compact(c.goal),
+        spendLabel: this.money(c.spend), budgetLabel: this.money(c.budget),
+        statusStyle: 'display:inline-block; font-size:11.5px; font-weight:700; padding:4px 11px; border-radius:30px; background:' + stColors[0] + '; color:' + stColors[1] + ';',
+        newBadge: c.isNew ? 'NEW' : '',
+        newBadgeStyle: c.isNew ? 'font-size:9px; font-weight:800; letter-spacing:.08em; color:#fff; background:#a8242f; padding:2px 6px; border-radius:3px;' : 'display:none;'
+      };
+    });
+
+    const activeCount = s.campaigns.filter(c => c.status !== 'Ended').length;
+    const imprSum = s.campaigns.reduce((a, c) => a + c.impressions, 0);
+    const spendSum = s.campaigns.reduce((a, c) => a + c.spend, 0);
+
+    return {
+      todayLabel: this.parseDate('2026-06-27').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' }),
+      goHome: () => this.setState({ view: 'home' }),
+      goPortal: () => { this.setState({ view: 'portal', step: 1 }); window.scrollTo(0,0); },
+      goDash: () => { this.setState({ view: 'dashboard' }); window.scrollTo(0,0); },
+
+      isHome: s.view === 'home', isPortal: s.view === 'portal', isDash: s.view === 'dashboard',
+      secondary: this.SECONDARY.map(it => ({
+        ...it,
+        onSelect: () => this.setState({ featured: it, featSeq: this.state.featSeq + 1 }),
+        boxStyle: it.logo
+          ? 'width:128px; height:78px; flex-shrink:0; background:transparent url(' + it.logo + ') center/contain no-repeat;'
+          : 'width:78px; height:78px; flex-shrink:0; background:repeating-linear-gradient(135deg,#e7e1d4,#e7e1d4 8px,#ded7c7 8px,#ded7c7 16px);'
+      })),
+      featured: this.buildFeatured(),
+      latest: this.LATEST, verticals: this.VERTICALS,
+      editions: this.EDITIONS.map(e => ({ ...e, coverStyle: 'position:absolute; inset:0; background:transparent url(' + e.img + ') top center/cover no-repeat;' })),
+
+      stepper,
+      isStep1: s.step === 1, isStep2: s.step === 2, isStep3: s.step === 3, isStep4: s.step === 4,
+      placements, sel,
+
+      headline: s.headline, bodyText: s.bodyText, cta: s.cta, url: s.url,
+      onHeadline: e => this.setState({ headline: e.target.value }),
+      onBody: e => this.setState({ bodyText: e.target.value }),
+      onCta: e => this.setState({ cta: e.target.value }),
+      onUrl: e => this.setState({ url: e.target.value }),
+      swatches,
+
+      isBuild: s.creativeMode === 'build', isUpload: s.creativeMode === 'upload',
+      setBuild: () => this.setState({ creativeMode: 'build' }),
+      setUpload: () => this.setState({ creativeMode: 'upload' }),
+      doUpload: () => this.setState({ uploaded: true }),
+      uploadHeadline: s.uploaded ? '✓ banner-final.png uploaded' : 'Drop your banner here',
+      uploadSub: s.uploaded ? 'Looks good — continue to scheduling.' : 'PNG or JPG up to 2 MB · ' + sel.dims,
+      buildTabStyle: 'padding:9px 16px; font-size:13.5px; font-weight:600; cursor:pointer; background:' + (s.creativeMode === 'build' ? '#16181d' : '#fff') + '; color:' + (s.creativeMode === 'build' ? '#fff' : '#3d3f47') + ';',
+      uploadTabStyle: 'padding:9px 16px; font-size:13.5px; font-weight:600; cursor:pointer; background:' + (s.creativeMode === 'upload' ? '#16181d' : '#fff') + '; color:' + (s.creativeMode === 'upload' ? '#fff' : '#3d3f47') + '; border-left:1px solid #d8d2c5;',
+
+      startDate: s.startDate, endDate: s.endDate,
+      onStart: e => this.setState({ startDate: e.target.value }),
+      onEnd: e => this.setState({ endDate: e.target.value }),
+      presets, days, dateRangeLabel: this.rangeLabel(),
+
+      budget: s.budget, budgetLabel: this.money(s.budget),
+      onBudget: e => this.setState({ budget: parseInt(e.target.value, 10) }),
+      estImpr: this.fmt(totalImpr), estClicks: this.fmt(clicks), cpmLabel: '$' + effCpm.toFixed(2),
+
+      canBack: s.step > 1, back: () => this.back(), next: () => this.next(),
+      nextLabel: s.step < 4 ? 'Continue' : 'Launch campaign',
+      stepHint: s.step < 4 ? 'Step ' + s.step + ' of 4' : 'You won\u2019t be charged in this prototype',
+
+      previewBuild: s.creativeMode === 'build', previewUpload: s.creativeMode === 'upload',
+      adShellStyle: 'width:100%; max-width:240px; background:#fff; border:1px solid #e2ddd2; border-radius:4px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,.08);',
+      adAccentStyle: 'height:6px; background:' + s.accent + ';',
+      adBtnStyle: 'display:inline-block; background:' + s.accent + '; color:#fff; font-family:\'Zilla Slab\',serif; font-weight:600; font-size:12px; padding:6px 13px; border-radius:2px;',
+
+      newCampaign: () => { this.setState({ view: 'portal', step: 1 }); window.scrollTo(0,0); },
+      statActive: activeCount, statImpr: this.compact(imprSum), statSpend: this.money(spendSum),
+      campaigns
+    };
+  }
+}
+</script>
+</body>
+</html>

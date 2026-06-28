@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Daily Reporter — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:    #f6f1e8;
+  --cream-2:  #ede7d9;
+  --cream-3:  #e0d8c8;
+  --ink:      #1c1a17;
+  --ink-2:    #4a4640;
+  --ink-3:    #8a8478;
+  --orange:   #c43420;
+  --orange-d: #a82b18;
+  --navy:     #182540;
+  --navy-2:   #0f1828;
+  --amber:    #c8791a;
+  --amber-l:  #f0a84a;
+  --rule:     rgba(28,26,23,0.12);
+  --rule-heavy: rgba(28,26,23,0.28);
+  --live:     #16a34a;
+  --urgent:   #dc2626;
+  --urgent-bg:#fef2f2;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Spectral', Georgia, serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ─── TICKER ──────────────────────────────── */
+.ticker {
+  background: var(--orange);
+  height: 52px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+.ticker-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  background: var(--navy-2);
+  color: #f6f1e8;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.ticker-dot {
+  width: 8px; height: 8px;
+  background: var(--live);
+  border-radius: 50%;
+  animation: blink 1.6s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:0.3; transform:scale(0.7); }
+}
+.ticker-track { flex:1; overflow:hidden; display:flex; align-items:center; cursor:pointer; }
+.ticker-track:hover .ticker-scroll { animation-play-state: paused; }
+.ticker-scroll {
+  display: flex;
+  white-space: nowrap;
+  gap: 0;
+  animation: marquee 160s linear infinite;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+.ticker-scroll .ticker-item {
+  margin: 0 28px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.ticker-scroll .ticker-item:hover { opacity: 0.75; }
+.ticker-scroll .sep { opacity: 0.5; margin: 0 8px; color: rgba(255,255,255,0.6); }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── TICKER POPUP ──────────────────────────────── */
+.ticker-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(24,37,64,0.55);
+  z-index: 900;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+.ticker-overlay.open { display: flex; }
+.ticker-popup {
+  background: var(--cream);
+  border: 1.5px solid var(--rule-heavy);
+  border-radius: 3px;
+  width: min(560px, 94vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(28,26,23,0.25);
+  animation: popIn 0.18s ease;
+}
+@keyframes popIn {
+  from { opacity:0; transform:translateY(-12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.ticker-popup-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule-heavy);
+  background: var(--navy);
+}
+.ticker-popup-head h4 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: rgba(246,241,232,0.6);
+  text-transform: uppercase;
+  flex: 1;
+}
+.ticker-popup-close {
+  background: none;
+  border: none;
+  color: rgba(246,241,232,0.5);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.ticker-popup-close:hover { color: #f6f1e8; }
+.ticker-popup-body { padding: 20px; }
+.ticker-popup-org {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.ticker-popup-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.ticker-popup-excerpt {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.ticker-popup-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+.ticker-popup-scroll-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.ticker-popup-scroll-link:hover { color: var(--orange-d); }
+
+/* ─── MASTHEAD ──────────────────────────────── */
+.masthead {
+  background: var(--cream);
+  text-align: center;
+  padding: 36px 48px 28px;
+  border-bottom: 2px solid var(--ink);
+  position: relative;
+}
+.masthead-rule {
+  height: 1px;
+  background: var(--rule-heavy);
+  margin-bottom: 20px;
+}
+.masthead-rule.bottom { margin-bottom: 0; margin-top: 20px; }
+.masthead-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.masthead-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 14px;
+}
+.masthead-title span { color: var(--orange); }
+.masthead-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.05em;
+}
+.masthead-sub .date { color: var(--orange); font-weight: 500; }
+
+/* ─── NAV ──────────────────────────────── */
+.site-nav {
+  border-bottom: 1px solid var(--rule-heavy);
+  background: var(--cream);
+  display: flex;
+  align-items: stretch;
+  padding: 0 48px;
+  gap: 0;
+}
+.site-nav a {
+  display: flex;
+  align-items: center;
+  padding: 11px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-right: 1px solid var(--rule);
+  transition: background 0.15s, color 0.15s;
+}
+.site-nav a:first-child { border-left: 1px solid var(--rule); }
+.site-nav a:hover { background: var(--cream-2); color: var(--ink); }
+.site-nav a.active { color: var(--orange); }
+.site-nav .spacer { flex: 1; }
+.site-nav .nav-cta {
+  background: var(--orange);
+  color: #fff !important;
+  border: none !important;
+  padding: 11px 22px;
+  font-weight: 600;
+}
+.site-nav .nav-cta:hover { background: var(--orange-d) !important; }
+
+/* ─── DASHBOARD GRID ──────────────────────────────── */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  min-height: calc(100vh - 120px);
+}
+
+/* ─── MAIN COLUMN ──────────────────────────────── */
+.main-col {
+  border-right: 2px solid var(--ink);
+  min-width: 0;
+}
+
+.section {
+  padding: 36px 44px;
+  border-bottom: 1px solid var(--rule-heavy);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+.section-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.section-rule { flex:1; height:1px; background:var(--rule-heavy); }
+.section-action {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--amber);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.section-action:hover { border-color: var(--amber); }
+
+/* ─── EDITIONS GRID ──────────────────────────────── */
+.editions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.edition-card {
+  display: block;
+  text-decoration: none;
+  aspect-ratio: 3/4;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rule-heavy);
+  border-radius: 2px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: var(--cream-2);
+}
+.edition-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(28,26,23,0.2);
+}
+.edition-card:hover .edition-cta { opacity: 1; transform: translateY(0); }
+.edition-card:hover .edition-img { transform: scale(1.04); }
+.edition-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.4s ease;
+}
+.edition-img-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-3);
+  text-align: center;
+  padding: 16px;
+}
+.edition-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(28,26,23,0.88) 100%);
+}
+.edition-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 12px 8px;
+  z-index: 1;
+}
+.edition-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--amber-l);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 3px;
+}
+.edition-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f6f1e8;
+  line-height: 1.2;
+  display: block;
+}
+.edition-cta {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--orange);
+  color: #fff;
+  text-align: center;
+  padding: 9px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+/* ─── AD BANNER ──────────────────────────────── */
+.ad-banner {
+  background: var(--cream-2);
+  border-bottom: 1px solid var(--rule-heavy);
+  padding: 28px 44px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.ad-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--orange), var(--amber));
+}
+.ad-banner-text { flex: 1; }
+.ad-banner-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--orange);
+  display: block;
+  margin-bottom: 8px;
+}
+.ad-banner-headline {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.ad-banner-body { font-size: 13px; color: var(--ink-2); line-height: 1.55; margin-bottom: 16px; }
+.btn-outline {
+  display: inline-block;
+  padding: 9px 20px;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 1px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-outline:hover { background: var(--ink); color: var(--cream); }
+.btn-orange {
+  background: var(--orange);
+  color: #fff;
+  border-color: var(--orange);
+}
+.btn-orange:hover { background: var(--orange-d); border-color: var(--orange-d); color: #fff; }
+.ad-banner-img img {
+  max-width: 220px;
+  max-height: 120px;
+  object-fit: contain;
+  opacity: 0.9;
+  border-radius: 2px;
+}
+
+/* ─── CLASSIFIEDS ──────────────────────────────── */
+.epoch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+.epoch-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 4px 8px;
+  border: 1px solid var(--rule-heavy);
+  border-radius: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.epoch-dot {
+  width: 5px; height: 5px;
+  background: var(--live);
+  border-radius: 50%;
+  animation: blink 1.6s ease-in-out infinite;
+}
+.epoch-label.new { color: var(--live); border-color: rgba(22,163,74,0.3); }
+
+.classifieds { border-top: 1px solid var(--rule-heavy); margin-top: 12px; margin-bottom: 28px; }
+
+.classified-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  transition: background 0.12s;
+  margin: 0 -44px;
+  padding-left: 44px;
+  padding-right: 44px;
+}
+.classified-row:hover { background: var(--cream-2); }
+.classified-row.is-open { background: var(--cream-2); }
+
+.cl-main { flex: 1; min-width: 0; }
+.cl-org {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  transition: color 0.12s;
+  display: block;
+  margin-bottom: 2px;
+}
+.classified-row:hover .cl-org,
+.classified-row.is-open .cl-org { color: var(--orange); }
+.cl-heading {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0.03em;
+  display: block;
+  margin-bottom: 4px;
+}
+.cl-excerpt {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cl-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.bid-chip {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 1px;
+  border: 1px solid var(--rule-heavy);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.bid-chip.urgent { color: var(--urgent); background: var(--urgent-bg); border-color: rgba(220,38,38,0.25); }
+.bid-chip.past { color: var(--ink-3); }
+.expand-icon { font-size: 14px; color: var(--ink-3); transition: transform 0.2s; }
+.is-open .expand-icon { transform: rotate(90deg); }
+
+.cl-fulltext {
+  display: none;
+  padding: 16px 44px 20px;
+  background: var(--cream-2);
+  border-bottom: 1px solid var(--rule-heavy);
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.cl-fulltext.visible { display: block; }
+.cl-fulltext p { margin-bottom: 10px; }
+.cl-fulltext strong { color: var(--ink); }
+.cl-fulltext a { color: var(--orange); }
+
+/* ─── EMAIL SIGNUP ──────────────────────────────── */
+.signup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.signup-pitch-lead {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-2);
+  margin-bottom: 18px;
+}
+.signup-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.signup-features li {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.signup-features li::before {
+  content: '✓';
+  color: var(--live);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.form-label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+.form-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+.form-check-label input { accent-color: var(--orange); }
+input[type="email"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--cream-3);
+  border-radius: 2px;
+  background: #fff;
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+input[type="email"]:focus { border-color: var(--orange); }
+.form-hint { font-size: 11px; color: var(--ink-3); margin-bottom: 14px; }
+.form-buttons { display: flex; gap: 10px; }
+.btn-primary {
+  padding: 10px 22px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--orange-d); }
+.btn-ghost {
+  padding: 10px 18px;
+  background: transparent;
+  color: var(--ink-2);
+  border: 1.5px solid var(--cream-3);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--ink-2); }
+
+/* ─── SIDEBAR ──────────────────────────────── */
+.sidebar {
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.live-ring {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: rgba(22,163,74,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-ring 2.2s ease-in-out infinite;
+}
+.live-core {
+  width: 6px; height: 6px;
+  background: var(--live);
+  border-radius: 50%;
+}
+@keyframes pulse-ring {
+  0%,100%{ background: rgba(22,163,74,0.15); }
+  50%{ background: rgba(22,163,74,0.4); }
+}
+.live-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: var(--live);
+}
+.sidebar-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f6f1e8;
+  flex: 1;
+}
+.sidebar-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(246,241,232,0.35);
+  letter-spacing: 0.05em;
+}
+.sidebar-feed {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sidebar-feed::-webkit-scrollbar { width: 3px; }
+.sidebar-feed::-webkit-scrollbar-track { background: transparent; }
+.sidebar-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+.feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.feed-item:hover { background: rgba(255,255,255,0.05); }
+.feed-item.is-new { }
+
+.feed-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(246,241,232,0.25);
+  padding-top: 2px;
+  width: 18px;
+  flex-shrink: 0;
+}
+.feed-body { flex: 1; min-width: 0; }
+.feed-org {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--amber-l);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.feed-heading {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: rgba(246,241,232,0.7);
+  line-height: 1.3;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: color 0.12s;
+}
+.feed-item:hover .feed-heading { color: #f6f1e8; }
+.feed-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  color: rgba(246,241,232,0.3);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.feed-right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding-top: 2px;
+}
+.countdown {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(246,241,232,0.5);
+}
+.countdown.urgent { color: #f87171; }
+.countdown.past { font-size: 10px; color: rgba(246,241,232,0.25); }
+.new-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--live);
+  border: 1px solid rgba(22,163,74,0.4);
+  padding: 1px 5px;
+  border-radius: 1px;
+}
+
+.sidebar-footer {
+  flex-shrink: 0;
+  padding: 14px 22px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cert-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cert-icon { font-size: 18px; flex-shrink: 0; }
+.cert-text strong {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(246,241,232,0.8);
+  letter-spacing: 0.04em;
+}
+.cert-text span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  color: rgba(246,241,232,0.3);
+}
+.sidebar-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px;
+  background: var(--orange);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+.sidebar-cta:hover { background: var(--orange-d); }
+
+/* ─── FOOTER ──────────────────────────────── */
+.site-footer {
+  background: var(--ink);
+  color: rgba(246,241,232,0.5);
+  padding: 24px 48px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border-top: 2px solid var(--ink);
+}
+.footer-brand {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f6f1e8;
+}
+.footer-sep { opacity: 0.2; }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { color: rgba(246,241,232,0.45); text-decoration: none; }
+.footer-links a:hover { color: var(--amber-l); }
+.footer-right { margin-left: auto; }
+
+/* ─── HAMBURGER ──────────────────────────────── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 16px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  margin-left: auto;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-links {
+  display: contents;
+}
+
+/* ─── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 900px) {
+  .dashboard { grid-template-columns: 1fr; }
+  .sidebar-sticky { position: static; height: auto; max-height: 500px; }
+  .editions-grid { grid-template-columns: repeat(2, 1fr); }
+  .signup-grid { grid-template-columns: 1fr; gap: 24px; }
+  .section { padding: 28px 24px; }
+  .masthead { padding: 28px 24px 20px; }
+  .ad-banner { flex-direction: column; gap: 20px; padding: 24px; }
+  .ad-banner-img { width: 100%; text-align: center; }
+  .ad-banner-img img { max-width: 180px; }
+  .classified-row { margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+  .cl-fulltext { padding: 16px 24px 20px; }
+  .site-footer { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px 24px; }
+  .footer-right { margin-left: 0; }
+}
+
+@media (max-width: 700px) {
+  .nav-hamburger { display: flex; }
+  .site-nav {
+    flex-wrap: wrap;
+    padding: 0 16px;
+    align-items: center;
+  }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid var(--rule);
+    padding: 8px 0 12px;
+    gap: 0;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a {
+    border: none !important;
+    border-bottom: 1px solid var(--rule) !important;
+    padding: 13px 4px;
+    font-size: 12px;
+    width: 100%;
+  }
+  .site-nav .spacer { display: none; }
+}
+
+@media (max-width: 520px) {
+  .ticker { height: 44px; }
+  .ticker-scroll { font-size: 12px; }
+  .ticker-label { padding: 0 12px; font-size: 10px; }
+  .masthead { padding: 20px 16px 16px; }
+  .masthead-eyebrow { font-size: 8px; letter-spacing: 0.15em; }
+  .section { padding: 22px 16px; }
+  .section-title { font-size: 21px; }
+  .editions-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .classified-row { margin: 0 -16px; padding-left: 16px; padding-right: 16px; gap: 10px; }
+  .cl-fulltext { padding: 14px 16px 18px; }
+  .cl-org { font-size: 15px; }
+  .ad-banner { padding: 20px 16px; }
+  .ad-banner-headline { font-size: 20px; }
+  .site-footer { padding: 16px; }
+  .footer-links { flex-wrap: wrap; gap: 12px; }
+  .sidebar-header { padding: 14px 16px 12px; }
+  .feed-item { padding: 10px 16px; }
+  .signup-grid { gap: 20px; }
+}
+
+@media (max-width: 380px) {
+  .editions-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .edition-name { font-size: 12px; }
+  .masthead-title { font-size: 38px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TICKER POPUP OVERLAY -->
+<div class="ticker-overlay" id="tickerOverlay" onclick="if(event.target===this)closeTickerPopup()">
+  <div class="ticker-popup">
+    <div class="ticker-popup-head">
+      <h4>Outreach Ad Detail</h4>
+      <button class="ticker-popup-close" onclick="closeTickerPopup()">×</button>
+    </div>
+    <div class="ticker-popup-body" id="tickerPopupBody"></div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-label">
+    <span class="ticker-dot"></span>LIVE
+  </div>
+  <div class="ticker-track">
+    <div class="ticker-scroll" id="tickerScroll">
+      <!-- JS will fill this -->
+    </div>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-rule"></div>
+  <p class="masthead-eyebrow">California's Construction Legal Journal &nbsp;·&nbsp; Since 1994</p>
+  <h1 class="masthead-title">The Daily <span>Reporter</span></h1>
+  <p class="masthead-sub">
+    <span class="date">Friday, April 18, 2026</span>
+    &nbsp;·&nbsp;
+    Legal Notices &nbsp;·&nbsp; Public Bids &nbsp;·&nbsp; Outreach Advertising
+  </p>
+  <div class="masthead-rule bottom"></div>
+</header>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links" id="navLinks">
+    <a href="#editions" class="active" onclick="closeNav()">Current Issues</a>
+    <a href="#outreach" onclick="closeNav()">Outreach Ads</a>
+    <a href="#signup" onclick="closeNav()">Email Alerts</a>
+    <a href="#" onclick="closeNav()">Advertise</a>
+  </div>
+  <div class="spacer"></div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+
+  <!-- MAIN COLUMN -->
+  <main class="main-col">
+
+    <!-- CURRENT EDITIONS -->
+    <section class="section" id="editions">
+      <div class="section-header">
+        <span class="section-label">Vol. XXXII</span>
+        <h2 class="section-title">Current Issues</h2>
+        <span class="section-rule"></span>
+      </div>
+      <div class="editions-grid">
+        <a href="https://www.flipsnack.com/66F8CBDD75E/builder-sblueprint-march-31-2026" target="_blank" class="edition-card">
+          <img class="edition-img" src="https://thedailyreporter.net/tmp/Builder%E2%80%99sBlueprint-march-31-2026-1.jpg" alt="Builder's Blueprint" onerror="this.style.display='none'">
+          <div class="edition-img-placeholder">Builder's<br>Blueprint</div>
+          <div class="edition-overlay"></div>
+          <div class="edition-info">
+            <span class="edition-date">March 31</span>
+            <span class="edition-name">Builder's Blueprint</span>
+          </div>
+          <div class="edition-cta">Read Now →</div>
+        </a>
+        <a href="https://www.flipsnack.com/66F8CBDD75E/reporter-april-1-2026-south" target="_blank" class="edition-card">
+          <img class="edition-img" src="https://thedailyreporter.net/tmp/reporter-April%201-2026-south-1.jpg" alt="Southern CA Edition" onerror="this.style.display='none'">
+          <div class="edition-img-placeholder">Southern CA<br>Edition</div>
+          <div class="edition-overlay"></div>
+          <div class="edition-info">
+            <span class="edition-date">April 1</span>
+            <span class="edition-name">Southern CA Edition</span>
+          </div>
+          <div class="edition-cta">Read Now →</div>
+        </a>
+        <a href="https://www.flipsnack.com/66F8CBDD75E/reporter-april-2-2026-north" target="_blank" class="edition-card">
+          <img class="edition-img" src="https://thedailyreporter.net/tmp/Reporter-April%202-2026-north-1.jpg" alt="Northern CA Edition" onerror="this.style.display='none'">
+          <div class="edition-img-placeholder">Northern CA<br>Edition</div>
+          <div class="edition-overlay"></div>
+          <div class="edition-info">
+            <span class="edition-date">April 2</span>
+            <span class="edition-name">Northern CA Edition</span>
+          </div>
+          <div class="edition-cta">Read Now →</div>
+        </a>
+        <a href="https://www.flipsnack.com/66F8CBDD75E/reporter-march-27-2026-water" target="_blank" class="edition-card">
+          <img class="edition-img" src="https://thedailyreporter.net/tmp/Reporter-March-27-2026-Water-1.jpg" alt="CA State Water Edition" onerror="this.style.display='none'">
+          <div class="edition-img-placeholder">CA State Water<br>Edition</div>
+          <div class="edition-overlay"></div>
+          <div class="edition-info">
+            <span class="edition-date">March 27</span>
+            <span class="edition-name">CA State Water Edition</span>
+          </div>
+          <div class="edition-cta">Read Now →</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- AD BANNER -->
+    <div class="ad-banner">
+      <div class="ad-banner-text">
+        <span class="ad-banner-eyebrow">Advertise with us</span>
+        <h3 class="ad-banner-headline">Reach California's builders</h3>
+        <p class="ad-banner-body">Certified by the CA Dept. of General Services since 1994. Your notice runs in every edition, on this site, in weekly emails, and on Twitter — all included.</p>
+        <a href="#" class="btn-outline">Get Advertising Info</a>
+      </div>
+      <div class="ad-banner-img">
+        <a href="http://capitalrubberco.com/" target="_blank">
+          <img src="assets/img/ads/capRubber.jpg" alt="Capital Rubber Co." onerror="this.parentElement.style.display='none'">
+        </a>
+      </div>
+    </div>
+
+    <!-- OUTREACH NOTICES -->
+    <section class="section" id="outreach">
+      <div class="section-header">
+        <h2 class="section-title">Outreach Ads</h2>
+        <span class="section-rule"></span>
+        <a href="#" class="section-action">Post a Notice →</a>
+      </div>
+
+      <div class="epoch">
+        <span class="epoch-label new"><span class="epoch-dot"></span> This Week</span>
+      </div>
+      <div class="classifieds" id="cl-new"></div>
+
+      <div class="epoch" style="margin-top:8px;">
+        <span class="epoch-label">Earlier Notices</span>
+      </div>
+      <div class="classifieds" id="cl-old"></div>
+
+    </section>
+
+    <!-- EMAIL SIGNUP -->
+    <section class="section" id="signup">
+      <div class="section-header">
+        <h2 class="section-title">Stay Ahead</h2>
+        <span class="section-rule"></span>
+      </div>
+      <div class="signup-grid">
+        <div>
+          <p class="signup-pitch-lead">Free weekly alerts — jobs open for bid and outreach notices delivered to your inbox before your competition sees them.</p>
+          <ul class="signup-features">
+            <li>Jobs open for bid, sorted by county</li>
+            <li>Contractor outreach &amp; prime-seeks-subs alerts</li>
+            <li>New bid opportunities every week</li>
+            <li>Your info is never sold or shared</li>
+          </ul>
+        </div>
+        <form onsubmit="return false;">
+          <label class="form-check-label">
+            <input type="checkbox" checked> Sign me up for the email service
+          </label>
+          <label class="form-label">Email Address</label>
+          <input type="email" placeholder="you@company.com">
+          <p class="form-hint">We'll never share your email. <a href="#" style="color:var(--orange);">Privacy Policy</a></p>
+          <div class="form-buttons">
+            <button class="btn-primary">Subscribe</button>
+            <button class="btn-ghost" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-sticky">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">Outreach Ads</h3>
+        <span class="sidebar-count" id="sidebarCount">14 active</span>
+      </div>
+      <div class="sidebar-feed" id="sidebarFeed"></div>
+      <div class="sidebar-footer">
+        <div class="cert-row">
+          <span class="cert-icon">✅</span>
+          <div class="cert-text">
+            <strong>CA Dept. of General Services</strong>
+            <span>Certified Trade Newspaper · Since 1994</span>
+          </div>
+        </div>
+        <a href="#" class="sidebar-cta">⚒ Post an Outreach Ad →</a>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /dashboard -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <span class="footer-brand">The Daily Reporter</span>
+  <span class="footer-sep">|</span>
+  <nav class="footer-links">
+    <a href="#">About</a>
+    <a href="#">Advertise</a>
+    <a href="#">Services</a>
+    <a href="#">Privacy</a>
+  </nav>
+  <span class="footer-right">© 2026 C&amp;S Publishing. All rights reserved.</span>
+</footer>
+
+<script>
+const today = new Date();
+
+const notices = [
+  { id: 1, org: 'Arntz Builders, Inc.', heading: 'Spring Lake MS &amp; Sequoia ES Modernizations', excerpt: 'Design-build modernization of Spring Lake Middle School and Sequoia Elementary — site work, structural upgrades, MEP systems.', bidDate: '2026-04-20', bidLabel: 'Bid Date', isNew: true },
+  { id: 2, org: 'Sacramento Housing &amp; Redevelopment Agency', heading: 'Home Repair Program — RFQ #2601-KP', excerpt: 'Request for qualifications for the SHRA Home Repair Program serving low-income homeowners throughout Sacramento County.', bidDate: '2026-04-20', bidLabel: 'Bid Date', isNew: true },
+  { id: 3, org: 'George E. Masker Painting, Inc.', heading: 'Greene Middle School Exterior Paint Project', excerpt: 'Exterior repaint of Greene Middle School buildings including surface preparation, priming, and two-coat finish system.', bidDate: '2026-04-21', bidLabel: 'Bid Date', isNew: true },
+  { id: 4, org: 'George E. Masker Painting, Inc.', heading: 'Tolenas Elementary School Exterior Paint Project', excerpt: 'Full exterior repaint of Tolenas Elementary including all building surfaces, trim, and hardscape features.', bidDate: '2026-04-21', bidLabel: 'Bid Date', isNew: true },
+  { id: 5, org: 'Cratus, Inc.', heading: 'Crystal Springs Pipeline No. 2 Reach 5 Lining Replacement', excerpt: 'Cured-in-place pipe lining replacement for Crystal Springs Pipeline No. 2, Reach 5 segment in San Mateo County.', bidDate: '2026-04-23', bidLabel: 'Bid Date', isNew: true },
+  { id: 6, org: 'Sacramento Housing &amp; Redevelopment Agency', heading: 'SHRA HVAC Pilot Property Assessment — RFP #2603-MA', excerpt: 'HVAC assessment services for a pilot set of SHRA-owned residential properties. Scope includes condition reports and replacement cost estimates.', bidDate: '2026-04-23', bidLabel: 'Bid Date', isNew: true },
+  { id: 7, org: 'George E. Masker Painting, Inc.', heading: 'Christa McAuliffe Middle School Paint &amp; Waterproofing', excerpt: 'Exterior painting and waterproofing at Christa McAuliffe Middle School — includes elastomeric coating on masonry walls.', bidDate: '2026-04-23', bidLabel: 'Bid Date', isNew: true },
+  { id: 8, org: 'Sully-Miller Contracting Company', heading: 'Ontario International Airport Authority', excerpt: 'Airfield pavement rehabilitation and remarking at Ontario International Airport. FAA-funded project requires DBE participation.', bidDate: '2026-04-27', bidLabel: 'Bid Date', isNew: false },
+  { id: 9, org: 'Ranger Pipelines, Inc.', heading: 'Penitencia Delivery &amp; Force Main Inspection and Rehabilitation', excerpt: 'Inspection and rehabilitation of the Penitencia Delivery and Force Main pipeline system — C0727 project for Santa Clara Valley Water District.', bidDate: '2026-05-06', bidLabel: 'Bid Date', isNew: false },
+  { id: 10, org: 'Mountain Cascade, Inc.', heading: 'FY24 Water Line Replacement Project', excerpt: 'Replacement of aging water distribution mains across multiple project areas. Includes trench excavation, pipe installation, and surface restoration.', bidDate: '2026-05-05', bidLabel: 'Bid Date', isNew: false },
+  { id: 11, org: 'C. Overaa &amp; Co.', heading: 'Kennedy High School Campus Modernization Phase 1.3 — Final GMP', excerpt: 'Final Guaranteed Maximum Price package for Phase 1.3 of the Kennedy High School Campus Modernization project in Richmond, CA.', bidDate: '2026-05-07', bidLabel: 'Bid Date', isNew: false },
+  { id: 12, org: 'Ranger Pipelines, Inc.', heading: 'Sewer Collection System Pipeline Rehabilitation — Phase 10', excerpt: 'Phase 10 of the sewer collection system pipeline rehabilitation and replacement project. CIPP lining and open-cut replacement methods.', bidDate: '2026-05-14', bidLabel: 'Bid Date', isNew: false },
+  { id: 13, org: 'Sacramento Housing &amp; Redevelopment Agency', heading: 'IFB #2606-KPma — Floor Covering Services', excerpt: 'Invitations for bid for floor covering services including carpet, LVP, and tile installation at SHRA-managed properties.', bidDate: '2026-05-11', bidLabel: 'Bid Date', isNew: false },
+  { id: 14, org: 'C. Overaa', heading: 'Windsor Secondary Treatment System Upgrades', excerpt: 'Major upgrades to the Town of Windsor secondary treatment facilities. Scope includes aeration systems, secondary clarifiers, and process controls.', bidDate: '2026-09-03', bidLabel: 'Bid Date', isNew: false },
+];
+
+function daysUntil(dateStr) {
+  const bid = new Date(dateStr);
+  const diff = Math.round((bid - today) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+function formatBidDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function countdownLabel(dateStr) {
+  const days = daysUntil(dateStr);
+  if (days < 0) return { text: 'PAST', cls: 'past' };
+  if (days <= 7) return { text: days + 'd ⚡', cls: 'urgent' };
+  return { text: days + 'd', cls: '' };
+}
+
+// Ticker popup
+function openTickerPopup(n) {
+  const { text, cls } = countdownLabel(n.bidDate);
+  document.getElementById('tickerPopupBody').innerHTML = `
+    <span class="ticker-popup-org">${n.org}</span>
+    <div class="ticker-popup-title">${n.heading}</div>
+    <p class="ticker-popup-excerpt">${n.excerpt}</p>
+    <div class="ticker-popup-meta">
+      <strong>${n.bidLabel}:</strong> ${formatBidDate(n.bidDate)}
+      &nbsp;·&nbsp; <span class="countdown ${cls}" style="font-size:inherit">${text === 'PAST' ? 'Bid date passed' : text + ' remaining'}</span>
+    </div>
+    <span class="ticker-popup-scroll-link" onclick="closeTickerPopup();setTimeout(()=>{const r=document.getElementById('cl-${n.id}');if(r){r.scrollIntoView({behavior:'smooth',block:'center'});r.click();}},200)">
+      View full notice ↓
+    </span>
+  `;
+  document.getElementById('tickerOverlay').classList.add('open');
+}
+function closeTickerPopup() {
+  document.getElementById('tickerOverlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTickerPopup(); });
+
+// Build sidebar feed
+const feed = document.getElementById('sidebarFeed');
+const sorted = [...notices].sort((a, b) => new Date(a.bidDate) - new Date(b.bidDate));
+sorted.forEach((n, i) => {
+  const { text, cls } = countdownLabel(n.bidDate);
+  const el = document.createElement('div');
+  el.className = 'feed-item' + (n.isNew ? ' is-new' : '');
+  el.innerHTML = `
+    <div class="feed-num">${i + 1}</div>
+    <div class="feed-body">
+      <div class="feed-org">${n.org}</div>
+      <div class="feed-heading">${n.heading}</div>
+      <div class="feed-date">${n.bidLabel}: ${formatBidDate(n.bidDate)}</div>
+    </div>
+    <div class="feed-right">
+      <span class="countdown ${cls}">${text}</span>
+    </div>
+  `;
+  el.onclick = () => {
+    const row = document.getElementById('cl-' + n.id);
+    if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.click(); }
+  };
+  feed.appendChild(el);
+});
+
+// Build classified lists
+function buildClassifiedRow(n) {
+  const { text, cls } = countdownLabel(n.bidDate);
+  const isUrgent = cls === 'urgent';
+  const isPast = cls === 'past';
+
+  const row = document.createElement('div');
+  row.className = 'classified-row';
+  row.id = 'cl-' + n.id;
+  row.innerHTML = `
+    <div class="cl-main">
+      <span class="cl-org">${n.org}</span>
+      <span class="cl-heading">${n.heading}</span>
+      <span class="cl-excerpt">${n.excerpt}</span>
+    </div>
+    <div class="cl-aside">
+      <span class="bid-chip ${isUrgent ? 'urgent' : isPast ? 'past' : ''}">
+        ${isUrgent ? '⚡ ' : ''}${n.bidLabel}: ${formatBidDate(n.bidDate)}
+      </span>
+      <span class="expand-icon">›</span>
+    </div>
+  `;
+
+  const fulltext = document.createElement('div');
+  fulltext.className = 'cl-fulltext';
+  fulltext.innerHTML = `
+    <p><strong>${n.heading}</strong><br>
+    Submitted by: <strong>${n.org}</strong></p>
+    <p>${n.excerpt} Contractors interested in subcontracting opportunities should contact the prime contractor directly. Certified DBE, MBE, WBE, and DVBE subcontractors are encouraged to submit qualifications.</p>
+    <p><strong>${n.bidLabel}:</strong> ${formatBidDate(n.bidDate)} at 2:00 PM<br>
+    <strong>Contact:</strong> <a href="#">Submit via TDR</a> or call the prime contractor for bonding and insurance requirements.</p>
+  `;
+
+  row.onclick = () => {
+    const wasOpen = row.classList.contains('is-open');
+    document.querySelectorAll('.classified-row.is-open').forEach(r => {
+      r.classList.remove('is-open');
+      r.nextElementSibling.classList.remove('visible');
+    });
+    if (!wasOpen) {
+      row.classList.add('is-open');
+      fulltext.classList.add('visible');
+    }
+  };
+
+  return [row, fulltext];
+}
+
+const newSorted = notices.filter(n => n.isNew).sort((a,b) => new Date(a.bidDate)-new Date(b.bidDate));
+const oldSorted = notices.filter(n => !n.isNew).sort((a,b) => new Date(a.bidDate)-new Date(b.bidDate));
+
+const clNew = document.getElementById('cl-new');
+const clOld = document.getElementById('cl-old');
+
+newSorted.forEach(n => { const [row, ft] = buildClassifiedRow(n); clNew.appendChild(row); clNew.appendChild(ft); });
+oldSorted.forEach(n => { const [row, ft] = buildClassifiedRow(n); clOld.appendChild(row); clOld.appendChild(ft); });
+
+// Build ticker
+const tickerScroll = document.getElementById('tickerScroll');
+function buildTickerItems() {
+  return notices.map(n =>
+    `<span class="ticker-item" data-id="${n.id}">${n.org} — ${n.heading}</span><span class="sep">◆</span>`
+  ).join('');
+}
+tickerScroll.innerHTML = buildTickerItems() + buildTickerItems(); // doubled for seamless loop
+tickerScroll.querySelectorAll('.ticker-item').forEach(el => {
+  el.addEventListener('click', () => {
+    const n = notices.find(x => x.id === +el.dataset.id);
+    if (n) openTickerPopup(n);
+  });
+});
+
+// Hamburger nav
+function toggleNav() {
+  const btn = document.getElementById('navHamburger');
+  const links = document.getElementById('navLinks');
+  btn.classList.toggle('open');
+  links.classList.toggle('open');
+}
+function closeNav() {
+  document.getElementById('navHamburger').classList.remove('open');
+  document.getElementById('navLinks').classList.remove('open');
+}
+</script>
+</body>
+</html>
