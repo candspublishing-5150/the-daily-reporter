@@ -15,12 +15,12 @@ The design prototype lives in `design/` — the canonical source of truth for UI
 - **CI/CD**: GitHub Actions
 - **Payments**: QuickBooks (may be replaced later)
 - **Email**: Mailchimp (may be replaced with Sequenzy)
-- **Analytics**: TBD (integrate site analytics)
+- **Analytics**: TBD
 
 ## Common Commands
 
 ```bash
-npm run dev           # Start local dev server
+npm run dev           # Start local dev server at http://localhost:3000
 npm run build         # Production build
 npm run lint          # Run ESLint
 npm run test          # Run tests
@@ -70,7 +70,6 @@ npx supabase db push  # Push migrations
 - Edit any user's ads, campaigns, run dates
 - View payment history / money paid
 - Manage users
-- Database management for all features
 
 ### 9. Auto-Design Papers
 - Automatically generate the newspaper PDF layouts
@@ -79,7 +78,6 @@ npx supabase db push  # Push migrations
 - Scrape Caltrans, water agencies, and other public works sites
 - Find jobs open for bid, store in database
 - Used to build the papers automatically
-- (There is a list of sites to scrape — to be provided)
 
 ### 11. TDR Plus — Fully Automated
 - AI handles everything end-to-end for the premium tier

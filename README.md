@@ -34,10 +34,18 @@ This repository is a ground-up rewrite of [thedailyreporter.net](https://thedail
 - Affiliate program portal
 - Admin dashboard for managing editions, ads, and email sends
 
+## Development
+
+```bash
+npm run dev     # Start local dev server at http://localhost:3000
+npm run build   # Production build
+npm run lint    # Run ESLint
+```
+
 ## Contact
 
-**C&S Publishing**  
-8258 Scarlet Oak Cir, Citrus Heights CA 95610  
+**C&S Publishing**
+8258 Scarlet Oak Cir, Citrus Heights CA 95610
 CandSPublishing@gmail.com | (916) 729-5432
 
 ## License
