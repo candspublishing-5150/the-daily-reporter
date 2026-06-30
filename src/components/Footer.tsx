@@ -16,7 +16,7 @@ export default function Footer() {
         <div style={{ display: "flex", gap: 48, flexWrap: "wrap", fontSize: 13 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
             <span style={{ color: "#fff", fontWeight: 600, fontFamily: "var(--font-zilla)" }}>Browse</span>
-            {[["Outreach Ads", "/ads"], ["Display Ads", "/display-ads"], ["Verticals", "/verticals"]].map(([l, h]) => (
+            {[["Outreach Ads", "/ads"], ["Current Issues", "/editions"], ["Display Ads", "/display-ads"]].map(([l, h]) => (
               <Link key={h} href={h} style={{ color: "var(--muted)", textDecoration: "none" }} className="hover:text-white transition-colors">{l}</Link>
             ))}
           </div>

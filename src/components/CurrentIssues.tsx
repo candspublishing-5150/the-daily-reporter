@@ -28,7 +28,7 @@ export default function CurrentIssues() {
           </a>
         ))}
       </div>
-      <div style={{ marginTop: 15, fontSize: 12, color: "#d98a8f", fontWeight: 600, cursor: "pointer" }}>Browse all editions →</div>
+      <a href="/editions" style={{ display: "block", marginTop: 15, fontSize: 12, color: "#d98a8f", fontWeight: 600, textDecoration: "none" }} className="hover:text-white transition-colors">Browse all editions →</a>
     </div>
   );
 }
