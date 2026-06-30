@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CurrentIssues from "@/components/CurrentIssues";
+import EmailSignup from "@/components/EmailSignup";
 
 const SECONDARY_ADS = [
   { kicker: "STEVE P. RADOS, INC.", title: "Western Trunk Line Project – Phase 1", meta: "Bid date: June 30, 2026 at 2:00 PM" },
@@ -131,6 +132,11 @@ export default function HomePage() {
             <AdSlot dims="SPONSOR SLOT · 300 × 600" label="Sponsor a vertical" />
             <AdSlot dims="SPONSOR SLOT · 300 × 600" label="Sponsor a county" />
           </div>
+        </div>
+
+        {/* Email signup */}
+        <div style={{ marginTop: 48 }}>
+          <EmailSignup />
         </div>
       </main>
       <Footer />
