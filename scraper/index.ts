@@ -61,9 +61,23 @@ async function run() {
     return;
   }
 
-  // Filter out listings with no title or source_url
-  const valid = allListings.filter(l => l.title && l.title.length > 2 && l.source_url);
-  console.log(`✓ Valid listings: ${valid.length}`);
+  // Filter out listings with no title or source_url, sanitize unicode
+  function sanitize(s: string | null): string | null {
+    if (!s) return null;
+    // Replace smart quotes, em/en dashes, and other non-latin1 chars with ASCII equivalents
+    return s
+      .replace(/[–—]/g, "-")
+      .replace(/[‘’]/g, "'")
+      .replace(/[“”]/g, '"')
+      .replace(/[^\x00-\xFF]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  const valid = allListings
+    .filter(l => l.title && l.title.length > 2 && l.source_url)
+    .map(l => ({ ...l, title: sanitize(l.title)!, agency: sanitize(l.agency)!, description: sanitize(l.description), contact_info: sanitize(l.contact_info) }));
+  console.log(`Valid listings: ${valid.length}`);
 
   // Upsert by source_url — deduplicates across runs
   let saved = 0;
@@ -89,7 +103,7 @@ async function run() {
       );
 
     if (error) {
-      console.error(`Batch ${i}–${i + BATCH} upsert error:`, error.message);
+      console.error(`Batch ${i}-${i + BATCH} upsert error:`, error.message);
       skipped += batch.length;
     } else {
       saved += batch.length;

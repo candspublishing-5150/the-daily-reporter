@@ -1,6 +1,7 @@
 // PlanetBids scraper — used by MWD, Santa Clara Valley Water, Fresno
-// API pattern: /portal/{id}/bo/bo-list-data
+// Scrapes the HTML search results page since their JSON API requires auth
 
+import * as cheerio from "cheerio";
 import type { Listing } from "../types";
 
 const PORTALS = [
@@ -14,65 +15,100 @@ export async function scrapePlanetBids(): Promise<Listing[]> {
 
   for (const portal of PORTALS) {
     try {
-      // PlanetBids has a JSON data endpoint that powers the search page
-      const url = `https://pbsystem.planetbids.com/portal/${portal.id}/bo/bo-list-data`;
+      const url = `https://pbsystem.planetbids.com/portal/${portal.id}/bo/bo-search`;
       const res = await fetch(url, {
         headers: {
-          "Accept": "application/json, text/javascript, */*",
-          "X-Requested-With": "XMLHttpRequest",
-          "Referer": `https://pbsystem.planetbids.com/portal/${portal.id}/bo/bo-search`,
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.5",
         },
+        signal: AbortSignal.timeout(15000),
       });
 
       if (!res.ok) {
-        console.warn(`PlanetBids ${portal.id}: HTTP ${res.status}`);
+        console.warn(`PlanetBids ${portal.agency}: HTTP ${res.status}`);
         continue;
       }
 
-      const data = await res.json() as { data?: PlanetBidsRow[] };
-      const rows = data?.data || (Array.isArray(data) ? data as PlanetBidsRow[] : []);
+      const html = await res.text();
+      const $ = cheerio.load(html);
 
-      for (const row of rows) {
-        if (!row.BidNumber && !row.Description) continue;
+      // PlanetBids renders a table or list of bids
+      // Try multiple selectors for different versions of their UI
+      const rows = $("table tbody tr, .bid-row, [class*='bid-item'], .row-bid");
+      let found = 0;
 
-        const bidDate = parsePlanetBidsDate(row.BidOpenDate || row.BidDueDate || "");
-        const sourceUrl = `https://pbsystem.planetbids.com/portal/${portal.id}/bo/bo-detail?bidId=${row.BidId || ""}`;
+      rows.each((_, row) => {
+        const cells = $(row).find("td");
+        if (cells.length < 2) return;
+
+        const getText = (i: number) => $(cells[i]).text().replace(/\s+/g, " ").trim();
+        const title = getText(1) || getText(0);
+        const bidDateText = getText(3) || getText(2);
+        const link = $(row).find("a").first().attr("href") || "";
+
+        if (!title || title.length < 3) return;
+        if (/^(bid|title|description|project|#)/i.test(title)) return;
+
+        const sourceUrl = link
+          ? (link.startsWith("http") ? link : `https://pbsystem.planetbids.com${link}`)
+          : url;
 
         results.push({
-          title: row.Description || row.BidTitle || row.BidNumber || "Untitled",
+          title,
           agency: portal.agency,
           county: portal.county,
-          bid_date: bidDate,
-          description: [row.BidNumber, row.BidCategory].filter(Boolean).join(" · ") || null,
+          bid_date: tryParseDate(bidDateText),
+          description: getText(0) || null, // bid number
           source_url: sourceUrl,
-          contact_info: row.ContactName ? `${row.ContactName} ${row.ContactPhone || ""}`.trim() : null,
+          contact_info: null,
         });
+        found++;
+      });
+
+      // If table scraping got nothing, try JSON embedded in page script tags
+      if (found === 0) {
+        const scriptMatch = html.match(/var\s+bidList\s*=\s*(\[.*?\]);/s)
+          || html.match(/bidListData\s*=\s*(\[.*?\])/s)
+          || html.match(/"bids"\s*:\s*(\[.*?\])/s);
+        if (scriptMatch) {
+          try {
+            const bids = JSON.parse(scriptMatch[1]) as Array<Record<string, string>>;
+            for (const bid of bids) {
+              const title = bid.description || bid.title || bid.BidTitle || bid.BidDescription;
+              if (!title) continue;
+              results.push({
+                title,
+                agency: portal.agency,
+                county: portal.county,
+                bid_date: tryParseDate(bid.bidDate || bid.BidDueDate || bid.dueDate || ""),
+                description: bid.bidNumber || bid.BidNumber || null,
+                source_url: bid.url || url,
+                contact_info: null,
+              });
+              found++;
+            }
+          } catch { /* JSON parse failed */ }
+        }
       }
 
-      console.log(`PlanetBids ${portal.agency}: ${rows.length} listings`);
+      console.log(`PlanetBids ${portal.agency}: ${found} listings`);
     } catch (err) {
-      console.error(`PlanetBids ${portal.id} error:`, err);
+      console.error(`PlanetBids ${portal.agency} error:`, err instanceof Error ? err.message : err);
     }
   }
 
   return results;
 }
 
-interface PlanetBidsRow {
-  BidId?: string;
-  BidNumber?: string;
-  Description?: string;
-  BidTitle?: string;
-  BidOpenDate?: string;
-  BidDueDate?: string;
-  BidCategory?: string;
-  ContactName?: string;
-  ContactPhone?: string;
-}
-
-function parsePlanetBidsDate(raw: string): string | null {
+function tryParseDate(raw: string): string | null {
   if (!raw) return null;
-  // PlanetBids returns dates like "07/15/2026 2:00 PM" or ISO strings
   const d = new Date(raw);
-  return isNaN(d.getTime()) ? null : d.toISOString();
+  if (!isNaN(d.getTime()) && d.getFullYear() > 2020) return d.toISOString();
+  const match = raw.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
+  if (match) {
+    const d2 = new Date(match[0]);
+    if (!isNaN(d2.getTime())) return d2.toISOString();
+  }
+  return null;
 }
