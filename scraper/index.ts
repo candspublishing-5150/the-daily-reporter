@@ -5,6 +5,13 @@
  * Scheduled via: .github/workflows/scraper.yml (every Monday 8am PT)
  */
 
+// Node 24 has native WebSocket but @supabase/supabase-js needs it on globalThis
+import { WebSocket } from "ws";
+if (typeof globalThis.WebSocket === "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).WebSocket = WebSocket;
+}
+
 import { createClient } from "@supabase/supabase-js";
 import { scrapeCaltrans } from "./sources/caltrans";
 import { scrapePlanetBids } from "./sources/planetbids";
