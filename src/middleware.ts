@@ -2,6 +2,23 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Admin auth — cookie-based password check
+  if (pathname.startsWith("/admin")) {
+    const adminToken = request.cookies.get("admin_token")?.value;
+    const expected = process.env.ADMIN_TOKEN;
+    if (!expected || adminToken !== expected) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      if (pathname !== "/admin/login") {
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+    return NextResponse.next();
+  }
+
+  // Customer auth — Supabase session check
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -23,7 +40,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  if (!user && pathname.startsWith("/dashboard")) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     return NextResponse.redirect(loginUrl);
@@ -33,5 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*"],
 };
