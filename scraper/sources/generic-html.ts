@@ -1,7 +1,4 @@
 // Generic HTML scrapers for sites with consistent table/list structures
-// Covers: eBidBoard (Kern), SF PUC, Imperial County, LA County DPW,
-//         LA County Online, LA County Office of Education, City of Roseville,
-//         El Dorado Irrigation, Imperial Irrigation (Procureware), Quality Bidders
 
 import * as cheerio from "cheerio";
 import type { Listing } from "../types";
@@ -16,33 +13,11 @@ type SiteConfig = {
   dateCol: number;
   linkCol?: number;
   skipRows?: number;
+  linkBase?: string;
 };
 
 const SITES: SiteConfig[] = [
-  {
-    name: "Kern County Roads (eBidBoard)",
-    url: "https://www.ebidboard.com/public/projects/index.asp?mbrguid=47F30E5A-EB31-43EE-A8CD-59AC6EA9E9BA",
-    agency: "County of Kern – Roads",
-    county: "Kern",
-    rowSelector: "table tr",
-    titleCol: 0, dateCol: 2, linkCol: 0, skipRows: 1,
-  },
-  {
-    name: "SF PUC",
-    url: "https://webapps.sfpuc.org/bids/bidlist.aspx?bidtype=1",
-    agency: "SF Public Utilities Commission",
-    county: "San Francisco",
-    rowSelector: "table tr, .bid-row",
-    titleCol: 0, dateCol: 2, linkCol: 0, skipRows: 1,
-  },
-  {
-    name: "Imperial County Public Works",
-    url: "https://publicworks.imperialcounty.org/projects-out-to-bid/",
-    agency: "Imperial County Public Works",
-    county: "Imperial",
-    rowSelector: "table tr, .entry-content li, article",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
-  },
+  // ── Working ─────────────────────────────────────────────────────────────
   {
     name: "LA County Public Works",
     url: "https://dpw.lacounty.gov/contracts/opportunities.aspx",
@@ -59,44 +34,88 @@ const SITES: SiteConfig[] = [
     rowSelector: "table tr",
     titleCol: 1, dateCol: 4, linkCol: 1, skipRows: 1,
   },
+
+  // ── SF PUC ──────────────────────────────────────────────────────────────
   {
-    name: "LA County Office of Education",
-    url: "https://www.lacoe.edu/Business-Services/Doing-Business-With-LACOE/Bid-and-RFP",
-    agency: "LA County Office of Education",
-    county: "Los Angeles",
-    rowSelector: "table tr, .field-items li",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
+    name: "SF PUC",
+    url: "https://webapps.sfpuc.org/bids/bidlist.aspx?bidtype=1",
+    agency: "SF Public Utilities Commission",
+    county: "San Francisco",
+    rowSelector: "table tr",
+    titleCol: 1, dateCol: 2, linkCol: 1, skipRows: 1,
+    linkBase: "https://webapps.sfpuc.org",
   },
+
+  // ── Imperial County ──────────────────────────────────────────────────────
   {
-    name: "City of Roseville",
-    url: "https://www.roseville.ca.us/cms/one.aspx?pageId=8944077",
-    agency: "City of Roseville",
-    county: "Placer",
+    name: "Imperial County Public Works",
+    url: "https://publicworks.imperialcounty.org/projects-out-to-bid/",
+    agency: "Imperial County Public Works",
+    county: "Imperial",
+    rowSelector: ".entry-content p, .entry-content li, table tr",
+    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 0,
+  },
+
+  // ── City of Long Beach ───────────────────────────────────────────────────
+  {
+    name: "City of Long Beach",
+    url: "https://www.longbeach.gov/finance/business-info/purchasing/solicitations/",
+    agency: "City of Long Beach",
+    county: "Los Angeles",
+    rowSelector: "table tr, .views-row",
+    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
+    linkBase: "https://www.longbeach.gov",
+  },
+
+  // ── Sacramento County ────────────────────────────────────────────────────
+  {
+    name: "Sacramento County Procurement",
+    url: "https://procurement.saccounty.gov/apps/solicitationlist.aspx",
+    agency: "Sacramento County",
+    county: "Sacramento",
+    rowSelector: "table tr",
+    titleCol: 1, dateCol: 3, linkCol: 1, skipRows: 1,
+  },
+
+  // ── City of Sacramento ───────────────────────────────────────────────────
+  {
+    name: "City of Sacramento Bids",
+    url: "https://www.cityofsacramento.gov/finance/purchasing/Current-Bid-Opportunities",
+    agency: "City of Sacramento",
+    county: "Sacramento",
+    rowSelector: "table tr, .views-row, article",
+    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
+    linkBase: "https://www.cityofsacramento.gov",
+  },
+
+  // ── City of Fresno ───────────────────────────────────────────────────────
+  {
+    name: "City of Fresno Bids",
+    url: "https://www.fresno.gov/finance/bids-rfps-rfqs/",
+    agency: "City of Fresno",
+    county: "Fresno",
+    rowSelector: "table tr, .entry-content li, .wp-block-table tr",
+    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
+    linkBase: "https://www.fresno.gov",
+  },
+
+  // ── Riverside County ─────────────────────────────────────────────────────
+  {
+    name: "Riverside County Procurement",
+    url: "https://www.rctlma.org/procurement/bids.aspx",
+    agency: "Riverside County Transportation & Land Management",
+    county: "Riverside",
     rowSelector: "table tr",
     titleCol: 0, dateCol: 2, linkCol: 0, skipRows: 1,
   },
-  {
-    name: "El Dorado Irrigation District",
-    url: "https://www.eid.org/doing-business-with-eid/procurement-and-contracts",
-    agency: "El Dorado Irrigation District",
-    county: "El Dorado",
-    rowSelector: "table tr, .field-items li",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 0,
-  },
-  {
-    name: "Imperial Irrigation District (Procureware)",
-    url: "https://iid.procureware.com/Bids",
-    agency: "Imperial Irrigation District",
-    county: "Imperial",
-    rowSelector: "table tr, .bid-item",
-    titleCol: 0, dateCol: 2, linkCol: 0, skipRows: 1,
-  },
+
+  // ── Quality Bidders ───────────────────────────────────────────────────────
   {
     name: "Quality Bidders",
     url: "https://www.qualitybidders.com/bids",
     agency: "Various (Quality Bidders)",
     county: "California",
-    rowSelector: "table tr, .bid-listing",
+    rowSelector: "table tr, .bid-listing, .project-row, [class*='bid']",
     titleCol: 0, dateCol: 2, linkCol: 0, skipRows: 1,
   },
 ];
@@ -108,8 +127,9 @@ export async function scrapeGenericSites(): Promise<Listing[]> {
     try {
       const res = await fetch(site.url, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; TDRBot/1.0; +https://thedailyreporter.net)",
-          "Accept": "text/html,application/xhtml+xml,*/*",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.9",
         },
         signal: AbortSignal.timeout(15000),
       });
@@ -125,31 +145,36 @@ export async function scrapeGenericSites(): Promise<Listing[]> {
       let found = 0;
 
       rows.each((i, row) => {
-        if (i < (site.skipRows ?? 1)) return; // skip header rows
+        if (i < (site.skipRows ?? 1)) return;
 
-        const cells = $(row).find("td, th, li");
-        const title = cells.eq(site.titleCol).text().replace(/\s+/g, " ").trim();
-        const dateText = cells.eq(site.dateCol).text().replace(/\s+/g, " ").trim();
+        const cells = $(row).find("td, li");
+        let title: string;
+        let dateText: string;
+
+        if (cells.length > 0) {
+          title = cells.eq(site.titleCol).text().replace(/\s+/g, " ").trim();
+          dateText = cells.eq(site.dateCol).text().replace(/\s+/g, " ").trim();
+        } else {
+          // For paragraph/div rows, use the element's own text
+          title = $(row).text().replace(/\s+/g, " ").trim();
+          dateText = "";
+        }
 
         if (!title || title.length < 4) return;
-        // skip obvious header rows
-        if (/^(project|title|description|bid|name|item)/i.test(title)) return;
+        if (/^(project|title|description|bid|name|item|solicitation|#)\b/i.test(title)) return;
 
         const linkEl = site.linkCol !== undefined
-          ? cells.eq(site.linkCol).find("a")
+          ? cells.eq(site.linkCol).find("a").first()
           : $(row).find("a").first();
-        const href = linkEl.attr("href") || "";
-        const sourceUrl = href
-          ? resolveUrl(href, site.url)
-          : site.url;
-
-        const bidDate = tryParseDate(dateText);
+        const href = linkEl.attr("href") || $(row).find("a").first().attr("href") || "";
+        const base = site.linkBase || new URL(site.url).origin;
+        const sourceUrl = href ? resolveUrl(href, base) : site.url;
 
         results.push({
           title,
           agency: site.agency,
           county: site.county,
-          bid_date: bidDate,
+          bid_date: tryParseDate(dateText),
           description: null,
           source_url: sourceUrl,
           contact_info: null,
@@ -168,20 +193,14 @@ export async function scrapeGenericSites(): Promise<Listing[]> {
 
 function resolveUrl(href: string, base: string): string {
   if (href.startsWith("http")) return href;
-  try {
-    return new URL(href, base).toString();
-  } catch {
-    return base;
-  }
+  try { return new URL(href, base).toString(); } catch { return base; }
 }
 
 function tryParseDate(raw: string): string | null {
   if (!raw) return null;
-  // Try common formats
   const cleaned = raw.replace(/\s+/g, " ").trim();
   const d = new Date(cleaned);
   if (!isNaN(d.getTime()) && d.getFullYear() > 2020) return d.toISOString();
-  // Try extracting a date pattern like MM/DD/YYYY
   const match = cleaned.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
   if (match) {
     const d2 = new Date(match[0]);
