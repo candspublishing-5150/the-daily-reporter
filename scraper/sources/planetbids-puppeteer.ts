@@ -6,9 +6,40 @@
 import type { Listing } from "../types";
 
 const PORTALS = [
+  // Water districts
   { id: "16151", agency: "Metropolitan Water District of Southern California", county: "Los Angeles" },
   { id: "48397", agency: "Santa Clara Valley Water District", county: "Santa Clara" },
+  // Cities
   { id: "14769", agency: "City of Fresno", county: "Fresno" },
+  { id: "15300", agency: "City of Sacramento", county: "Sacramento" },
+  { id: "17950", agency: "City of San Diego", county: "San Diego" },
+  { id: "19898", agency: "City of San Jose", county: "Santa Clara" },
+  { id: "41483", agency: "City of Oakland", county: "Alameda" },
+  { id: "13910", agency: "City of Long Beach", county: "Los Angeles" },
+  { id: "40862", agency: "City of Anaheim", county: "Orange" },
+  { id: "24507", agency: "City of Riverside", county: "Riverside" },
+  { id: "26178", agency: "City of Bakersfield", county: "Kern" },
+  { id: "22818", agency: "City of Stockton", county: "San Joaquin" },
+  { id: "35867", agency: "City of Modesto", county: "Stanislaus" },
+  { id: "23404", agency: "City of Chula Vista", county: "San Diego" },
+  { id: "36960", agency: "City of Fremont", county: "Alameda" },
+  { id: "46237", agency: "City of Santa Ana", county: "Orange" },
+  // Counties
+  { id: "42098", agency: "Los Angeles County Public Works", county: "Los Angeles" },
+  { id: "34534", agency: "San Diego County", county: "San Diego" },
+  { id: "27139", agency: "Sacramento County", county: "Sacramento" },
+  { id: "44371", agency: "Alameda County", county: "Alameda" },
+  { id: "29175", agency: "Contra Costa County", county: "Contra Costa" },
+  // Transit / special districts
+  { id: "46046", agency: "Los Angeles County Metropolitan Transportation Authority", county: "Los Angeles" },
+  { id: "21254", agency: "Foothill Transit", county: "Los Angeles" },
+  { id: "38698", agency: "Orange County Transportation Authority", county: "Orange" },
+  { id: "26396", agency: "San Diego Metropolitan Transit System", county: "San Diego" },
+  // School districts
+  { id: "35285", agency: "Los Angeles Unified School District", county: "Los Angeles" },
+  { id: "43929", agency: "San Diego Unified School District", county: "San Diego" },
+  { id: "28927", agency: "Sacramento City Unified School District", county: "Sacramento" },
+  { id: "22531", agency: "Fresno Unified School District", county: "Fresno" },
 ];
 
 const BASE = "https://vendors.planetbids.com";
