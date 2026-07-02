@@ -9,10 +9,14 @@ type SiteConfig = {
   agency: string;
   county: string;
   rowSelector: string;
-  titleCol: number;
-  dateCol: number;
+  // Column-index mode (most sites)
+  titleCol?: number;
+  dateCol?: number;
   linkCol?: number;
   skipRows?: number;
+  // CSS-selector mode (used when rows don't use <td> column layout)
+  titleSelector?: string;
+  dateSelector?: string;
   linkBase?: string;
 };
 
@@ -35,25 +39,16 @@ const SITES: SiteConfig[] = [
     titleCol: 1, dateCol: 4, linkCol: 1, skipRows: 1,
   },
 
-  // ── SF PUC ──────────────────────────────────────────────────────────────
+  // ── SF PUC — uses <li class="odd/even"> with <span class="col2/col3"> ──
   {
     name: "SF PUC",
     url: "https://webapps.sfpuc.org/bids/bidlist.aspx?bidtype=1",
     agency: "SF Public Utilities Commission",
     county: "San Francisco",
-    rowSelector: "table tr",
-    titleCol: 1, dateCol: 2, linkCol: 1, skipRows: 1,
+    rowSelector: "li.odd, li.even",
+    titleSelector: "span.col2",
+    dateSelector: "span.col3",
     linkBase: "https://webapps.sfpuc.org",
-  },
-
-  // ── Imperial County ──────────────────────────────────────────────────────
-  {
-    name: "Imperial County Public Works",
-    url: "https://publicworks.imperialcounty.org/projects-out-to-bid/",
-    agency: "Imperial County Public Works",
-    county: "Imperial",
-    rowSelector: ".entry-content p, .entry-content li, table tr",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 0,
   },
 
   // ── City of Long Beach (BuySpeed portal — server-rendered) ───────────────
@@ -65,39 +60,6 @@ const SITES: SiteConfig[] = [
     rowSelector: "table tr, .search-results tr, [class*='bid'] tr",
     titleCol: 1, dateCol: 3, linkCol: 1, skipRows: 1,
     linkBase: "https://longbeachbuys.buyspeed.com",
-  },
-
-  // ── Sacramento County DGS ────────────────────────────────────────────────
-  {
-    name: "Sacramento County Procurement",
-    url: "https://dgs.saccounty.gov/capsd/Pages/Current-Bid-Opportunities.aspx",
-    agency: "Sacramento County",
-    county: "Sacramento",
-    rowSelector: "table tr",
-    titleCol: 1, dateCol: 2, linkCol: 1, skipRows: 1,
-    linkBase: "https://dgs.saccounty.gov",
-  },
-
-  // ── City of Fresno capital projects ─────────────────────────────────────
-  {
-    name: "City of Fresno Bids",
-    url: "https://www.fresno.gov/capitalprojects/projects/bid-opportunities/",
-    agency: "City of Fresno",
-    county: "Fresno",
-    rowSelector: "table tr, .entry-content li, .wp-block-table tr, article",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
-    linkBase: "https://www.fresno.gov",
-  },
-
-  // ── Fresno County ────────────────────────────────────────────────────────
-  {
-    name: "Fresno County Purchasing",
-    url: "https://www.fresnocountyca.gov/Departments/General-Services-Department/Purchasing-Services/Bid-Opportunities",
-    agency: "County of Fresno",
-    county: "Fresno",
-    rowSelector: "table tr, .field-items li, .views-row",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
-    linkBase: "https://www.fresnocountyca.gov",
   },
 
   // ── Quality Bidders ───────────────────────────────────────────────────────
@@ -136,30 +98,40 @@ export async function scrapeGenericSites(): Promise<Listing[]> {
       let found = 0;
 
       rows.each((i, row) => {
-        if (i < (site.skipRows ?? 1)) return;
-
-        const cells = $(row).find("td, li");
         let title: string;
         let dateText: string;
+        let sourceUrl: string;
+        const base = site.linkBase || new URL(site.url).origin;
 
-        if (cells.length > 0) {
-          title = cells.eq(site.titleCol).text().replace(/\s+/g, " ").trim();
-          dateText = cells.eq(site.dateCol).text().replace(/\s+/g, " ").trim();
+        if (site.titleSelector) {
+          // CSS-selector mode: named child elements (e.g. SF PUC <li> rows)
+          if (i < (site.skipRows ?? 0)) return;
+          title = $(row).find(site.titleSelector).text().replace(/\s+/g, " ").trim();
+          dateText = site.dateSelector
+            ? $(row).find(site.dateSelector).text().replace(/\s+/g, " ").trim()
+            : "";
+          const href = $(row).find("a").first().attr("href") || "";
+          sourceUrl = href ? resolveUrl(href, base) : site.url;
         } else {
-          // For paragraph/div rows, use the element's own text
-          title = $(row).text().replace(/\s+/g, " ").trim();
-          dateText = "";
+          // Column-index mode: <td> / <li> by index
+          if (i < (site.skipRows ?? 1)) return;
+          const cells = $(row).find("td, li");
+          if (cells.length > 0) {
+            title = cells.eq(site.titleCol ?? 0).text().replace(/\s+/g, " ").trim();
+            dateText = cells.eq(site.dateCol ?? 1).text().replace(/\s+/g, " ").trim();
+          } else {
+            title = $(row).text().replace(/\s+/g, " ").trim();
+            dateText = "";
+          }
+          const linkEl = site.linkCol !== undefined
+            ? cells.eq(site.linkCol).find("a").first()
+            : $(row).find("a").first();
+          const href = linkEl.attr("href") || $(row).find("a").first().attr("href") || "";
+          sourceUrl = href ? resolveUrl(href, base) : site.url;
         }
 
         if (!title || title.length < 4) return;
         if (/^(project|title|description|bid|name|item|solicitation|#)\b/i.test(title)) return;
-
-        const linkEl = site.linkCol !== undefined
-          ? cells.eq(site.linkCol).find("a").first()
-          : $(row).find("a").first();
-        const href = linkEl.attr("href") || $(row).find("a").first().attr("href") || "";
-        const base = site.linkBase || new URL(site.url).origin;
-        const sourceUrl = href ? resolveUrl(href, base) : site.url;
 
         results.push({
           title,
