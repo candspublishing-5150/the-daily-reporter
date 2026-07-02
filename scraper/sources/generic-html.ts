@@ -56,57 +56,48 @@ const SITES: SiteConfig[] = [
     titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 0,
   },
 
-  // ── City of Long Beach ───────────────────────────────────────────────────
+  // ── City of Long Beach (BuySpeed portal — server-rendered) ───────────────
   {
     name: "City of Long Beach",
-    url: "https://www.longbeach.gov/finance/business-info/purchasing/solicitations/",
+    url: "https://longbeachbuys.buyspeed.com/bso/view/search/external/advancedSearchBid.xhtml?openBids=true",
     agency: "City of Long Beach",
     county: "Los Angeles",
-    rowSelector: "table tr, .views-row",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
-    linkBase: "https://www.longbeach.gov",
+    rowSelector: "table tr, .search-results tr, [class*='bid'] tr",
+    titleCol: 1, dateCol: 3, linkCol: 1, skipRows: 1,
+    linkBase: "https://longbeachbuys.buyspeed.com",
   },
 
-  // ── Sacramento County ────────────────────────────────────────────────────
+  // ── Sacramento County DGS ────────────────────────────────────────────────
   {
     name: "Sacramento County Procurement",
-    url: "https://procurement.saccounty.gov/apps/solicitationlist.aspx",
+    url: "https://dgs.saccounty.gov/capsd/Pages/Current-Bid-Opportunities.aspx",
     agency: "Sacramento County",
     county: "Sacramento",
     rowSelector: "table tr",
-    titleCol: 1, dateCol: 3, linkCol: 1, skipRows: 1,
+    titleCol: 1, dateCol: 2, linkCol: 1, skipRows: 1,
+    linkBase: "https://dgs.saccounty.gov",
   },
 
-  // ── City of Sacramento ───────────────────────────────────────────────────
-  {
-    name: "City of Sacramento Bids",
-    url: "https://www.cityofsacramento.gov/finance/purchasing/Current-Bid-Opportunities",
-    agency: "City of Sacramento",
-    county: "Sacramento",
-    rowSelector: "table tr, .views-row, article",
-    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
-    linkBase: "https://www.cityofsacramento.gov",
-  },
-
-  // ── City of Fresno ───────────────────────────────────────────────────────
+  // ── City of Fresno capital projects ─────────────────────────────────────
   {
     name: "City of Fresno Bids",
-    url: "https://www.fresno.gov/finance/bids-rfps-rfqs/",
+    url: "https://www.fresno.gov/capitalprojects/projects/bid-opportunities/",
     agency: "City of Fresno",
     county: "Fresno",
-    rowSelector: "table tr, .entry-content li, .wp-block-table tr",
+    rowSelector: "table tr, .entry-content li, .wp-block-table tr, article",
     titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
     linkBase: "https://www.fresno.gov",
   },
 
-  // ── Riverside County ─────────────────────────────────────────────────────
+  // ── Fresno County ────────────────────────────────────────────────────────
   {
-    name: "Riverside County Procurement",
-    url: "https://www.rctlma.org/procurement/bids.aspx",
-    agency: "Riverside County Transportation & Land Management",
-    county: "Riverside",
-    rowSelector: "table tr",
-    titleCol: 0, dateCol: 2, linkCol: 0, skipRows: 1,
+    name: "Fresno County Purchasing",
+    url: "https://www.fresnocountyca.gov/Departments/General-Services-Department/Purchasing-Services/Bid-Opportunities",
+    agency: "County of Fresno",
+    county: "Fresno",
+    rowSelector: "table tr, .field-items li, .views-row",
+    titleCol: 0, dateCol: 1, linkCol: 0, skipRows: 1,
+    linkBase: "https://www.fresnocountyca.gov",
   },
 
   // ── Quality Bidders ───────────────────────────────────────────────────────

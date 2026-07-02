@@ -3,7 +3,12 @@
 
 import type { Listing } from "../types";
 
-const API_URL = "https://caleprocure.ca.gov/caleprocure-api/public/events/search";
+// Try multiple known API paths — Cal eProcure has changed endpoints over time
+const API_URLS = [
+  "https://caleprocure.ca.gov/caleprocure-api/public/events/search",
+  "https://caleprocure.ca.gov/api/public/events/search",
+  "https://caleprocure.ca.gov/caleprocure-api/v2/public/events/search",
+];
 
 export async function scrapeCalEProcure(): Promise<Listing[]> {
   const results: Listing[] = [];
@@ -19,31 +24,41 @@ export async function scrapeCalEProcure(): Promise<Listing[]> {
       eventStatuses: ["OPEN"],
     };
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Origin": "https://caleprocure.ca.gov",
-        "Referer": "https://caleprocure.ca.gov/pages/Events-BS3/event-search.aspx",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-        "sec-ch-ua-mobile": "?0",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(20000),
-    });
+    const headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json, text/plain, */*",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Origin": "https://caleprocure.ca.gov",
+      "Referer": "https://caleprocure.ca.gov/pages/Events-BS3/event-search.aspx",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+      "sec-ch-ua-mobile": "?0",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
+    };
 
-    if (!res.ok) {
-      console.warn(`Cal eProcure: HTTP ${res.status}`);
+    let data: CalEProcureResponse | null = null;
+    for (const apiUrl of API_URLS) {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(20000),
+      });
+      if (res.ok) {
+        data = await res.json() as CalEProcureResponse;
+        console.log(`Cal eProcure: connected via ${apiUrl}`);
+        break;
+      }
+      console.warn(`Cal eProcure: ${apiUrl} -> HTTP ${res.status}`);
+    }
+
+    if (!data) {
+      console.warn("Cal eProcure: all API endpoints failed");
       return results;
     }
 
-    const data = await res.json() as CalEProcureResponse;
     const items: CalEProcureItem[] = data?.items || data?.results || data?.data || (Array.isArray(data) ? data : []);
 
     for (const item of items) {
