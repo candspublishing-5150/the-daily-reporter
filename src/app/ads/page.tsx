@@ -41,10 +41,13 @@ export default async function AdsPage({
 
   const supabase = await createClient();
 
+  // Hide listings whose bid deadline has passed; keep ones with no known deadline
+  const today = new Date().toISOString().slice(0, 10);
   let query = supabase
     .from("listings")
     .select("*", { count: "exact" })
-    .order("bid_date", { ascending: true })
+    .or(`bid_date.gte.${today},bid_date.is.null`)
+    .order("bid_date", { ascending: true, nullsFirst: false })
     .range((currentPage - 1) * perPage, currentPage * perPage - 1);
 
   if (selectedCounty && selectedCounty !== "All Counties") {

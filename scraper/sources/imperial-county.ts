@@ -26,11 +26,16 @@ export async function scrapeImperialCounty(): Promise<Listing[]> {
 
     const posts = (await res.json()) as WPPost[];
 
+    const cutoff = Date.now() - 90 * 86400000;
+
     for (const post of posts) {
       const title = decodeHtmlEntities(post.title?.rendered || "").trim();
       if (!title || title.length < 4) continue;
       // Filter to bid-related posts
       if (!/bid|notice|contract|proposal|rfp|rfq|ifb|solicit/i.test(title)) continue;
+      // post.date is the WP publish date, NOT the bid due date — use it only
+      // to skip stale announcements
+      if (post.date && new Date(post.date).getTime() < cutoff) continue;
 
       const excerpt = post.excerpt?.rendered
         ? decodeHtmlEntities(post.excerpt.rendered.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).trim()
@@ -40,7 +45,7 @@ export async function scrapeImperialCounty(): Promise<Listing[]> {
         title,
         agency: "Imperial County Public Works",
         county: "Imperial",
-        bid_date: post.date ? new Date(post.date).toISOString() : null,
+        bid_date: extractDueDate(`${title} ${excerpt || ""}`),
         description: excerpt || null,
         source_url: post.link || "https://publicworks.imperialcounty.org",
         contact_info: null,
@@ -60,6 +65,26 @@ interface WPPost {
   link?: string;
   date?: string;
   excerpt?: { rendered: string };
+}
+
+// Pull a bid due date out of the notice text, e.g. "July 10, 2026" or "7/10/2026".
+// Returns the first date that parses and lands within a plausible bid window.
+function extractDueDate(text: string): string | null {
+  const patterns = [
+    /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/gi,
+    /\d{1,2}\/\d{1,2}\/\d{4}/g,
+  ];
+  const now = Date.now();
+  const min = now - 30 * 86400000;
+  const max = now + 365 * 86400000;
+  for (const re of patterns) {
+    for (const match of text.match(re) || []) {
+      const d = new Date(match);
+      const t = d.getTime();
+      if (!isNaN(t) && t >= min && t <= max) return d.toISOString();
+    }
+  }
+  return null;
 }
 
 function decodeHtmlEntities(s: string): string {
