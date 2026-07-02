@@ -68,9 +68,9 @@ export async function scrapePlanetBids(): Promise<Listing[]> {
 
       // If table scraping got nothing, try JSON embedded in page script tags
       if (found === 0) {
-        const scriptMatch = html.match(/var\s+bidList\s*=\s*(\[.*?\]);/s)
-          || html.match(/bidListData\s*=\s*(\[.*?\])/s)
-          || html.match(/"bids"\s*:\s*(\[.*?\])/s);
+        const scriptMatch = html.match(/var\s+bidList\s*=\s*(\[[\s\S]*?\]);/)
+          || html.match(/bidListData\s*=\s*(\[[\s\S]*?\])/)
+          || html.match(/"bids"\s*:\s*(\[[\s\S]*?\])/);
         if (scriptMatch) {
           try {
             const bids = JSON.parse(scriptMatch[1]) as Array<Record<string, string>>;
