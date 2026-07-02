@@ -24,16 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Puppeteer Chrome
-        run: npx puppeteer browsers install chrome
-
       - name: Run scraper
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          PLANETBIDS_EMAIL: ${{ secrets.PLANETBIDS_EMAIL }}
-          PLANETBIDS_PASSWORD: ${{ secrets.PLANETBIDS_PASSWORD }}
         run: npx tsx scraper/index.ts
 
       - name: Report result
